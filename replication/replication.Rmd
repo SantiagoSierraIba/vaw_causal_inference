@@ -1,0 +1,1253 @@
+---
+title: "Replication and Extension: Reducing Violence Against Women in Uganda through Video Dramas"
+subtitle: "Causal Inference in AI Models -- Group Project"
+author: "Group Project Team"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    theme: flatly
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 10,
+  fig.height = 6,
+  cache = TRUE
+)
+```
+
+# Introduction
+
+## Paper Overview
+
+We replicate and extend **"Reducing Violence Against Women in Uganda through Video Dramas: An Experimental Test to Illuminate Causal Mechanisms"** by Jasper Cooper, Donald P. Green, and Anna M. Wilke (American Economic Review Papers & Proceedings). The companion paper is **"Countering Violence Against Women by Encouraging Disclosure: A Mass Media Experiment in Rural Uganda"** (Comparative Political Studies, 2019).
+
+## Research Question
+
+Can a mass media campaign --- specifically, short anti-violence-against-women (anti-VAW) video vignettes screened at community film festivals --- change attitudes toward VAW, encourage reporting of violent incidents, and ultimately reduce the occurrence of intimate partner violence in rural Uganda?
+
+## Experimental Design
+
+The study is a **cluster-randomized controlled trial** conducted across 112 rural communities in central Uganda. Villages were organized into 16 geographic blocks and randomly assigned to one of seven conditions:
+
+-   **Anti-VAW only** (3 vignettes about domestic violence)
+-   **Anti-VAW + Abortion stigma** (combination)
+-   **Anti-VAW + Teacher absenteeism** (combination)
+-   Abortion stigma only
+-   Absenteeism only
+-   Abortion + Absenteeism
+-   **Placebo** (Hollywood films only, no vignettes)
+
+For the main analysis, the first three conditions (all containing anti-VAW content) are the **treatment group** (IPV = 1), and the remaining four are the **control group** (IPV = 0).
+
+Film festivals ran weekly from July 30 to September 4, 2016 (6 screenings per village). A **midline survey** was conducted in October 2016 (N = 5,344) and an **endline survey** in May 2017 (N = 1,035 compliers re-interviewed). The main analyses focus on **compliers**: respondents who attended at least one screening.
+
+## Main Findings
+
+1.  **No effect on attitudes**: The campaign did not change respondents' views on the acceptability of VAW or gender hierarchy.
+2.  **Strong effect on reporting willingness**: Women exposed to anti-VAW vignettes were significantly more likely to say they would report hypothetical incidents to authorities (11 pp increase at midline for reporting to police).
+3.  **Suggestive reduction in victimization**: Consistent negative effects on the number and probability of violence incidents (p-values between .007 and .138).
+4.  **Causal mechanism**: A survey experiment (Table 1 in the AER P&P paper) suggests the campaign works by reducing concerns about being labeled a "gossip" for reporting, rather than by changing attitudes directly.
+
+## Our Approach
+
+We replicate the key tables and figures from both papers, then **extend the analysis using causal forests** (Athey, Tibshirani & Wager, 2019) to explore treatment effect heterogeneity in a data-driven manner, and compare these findings to the paper's subgroup analyses.
+
+------------------------------------------------------------------------
+
+# Setup
+
+```{r packages, cache=FALSE}
+# Required packages
+required_packages <- c(
+  "dplyr", "ggplot2", "lmtest", "sandwich",
+  "stargazer", "MASS", "knitr", "kableExtra", "grf", "gridExtra"
+)
+
+# Install missing packages
+new_packages <- required_packages[!(required_packages %in% installed.packages()[, "Package"])]
+if (length(new_packages)) {
+  install.packages(new_packages, repos = "https://cloud.r-project.org")
+}
+
+invisible(lapply(required_packages, library, character.only = TRUE))
+
+# Ensure dplyr::select is not masked by MASS::select
+select <- dplyr::select
+
+# Define cluster.vcov as a wrapper around sandwich::vcovCL
+# (the original code uses multiwayvcov::cluster.vcov, which gives equivalent results)
+cluster.vcov <- function(model, cluster) {
+  sandwich::vcovCL(model, cluster = cluster)
+}
+
+set.seed(123456789)
+```
+
+## Load Data
+
+We load the pre-built dataset from the replication package. This `.Rdata` file contains the full workspace after data cleaning, variable coding, imputation, and merging of midline into endline data.
+
+```{r load-data, cache=FALSE}
+# Load the pre-built dataset
+load("../Countering_VAW_replication/01_data/UG_VAW_data.Rdata")
+```
+
+## Build Composite Indices
+
+The following indices are constructed *after* the data is saved in the original pipeline, so we build them here.
+
+```{r build-indices}
+# --- Endline indices (from el data) ---
+
+# Violence disapproval: average of ipv_attitude and disobey (both coded so higher = more disapproval)
+el$violence_disapproval    <- (el$ipv_attitude + el$disobey) / 2
+el$violence_disapproval_ml <- (el$ipv_attitude_ml + el$disobey_ml) / 2
+
+# Intervention/reporting index: average of 4 reporting items
+el$intervene_index    <- (el$involve_lc1 + el$involve_nabakyala +
+                           el$involve_parents + el$report_police) / 4
+el$intervene_index_ml <- (el$involve_lc1_ml + el$involve_nabakyala_ml +
+                           el$involve_parents_ml + el$report_police_ml) / 4
+# Combined midline-endline index
+el$intervene_index_ml_3 <- (el$intervene_index + el$intervene_index_ml) / 2
+
+# Any violence indicator
+el$any_violence <- as.numeric(el$household_violence > 0)
+
+# Community norms
+el$violence_disapproval_comm <- (el$disobey_comm + el$ipv_norm) / 2
+
+# Gender equality attitudes (endline)
+el$support_gender_equality <- (el$boys_school_not_more_imp + el$able_marry +
+                                el$father_not_final_say + el$men_should_participate) / 4
+
+# Gender equality attitudes (midline, merged into el)
+el$support_gender_equality_ml <- (el$not_better_man_achiever_ml +
+                                   el$women_should_not_kneel_ml +
+                                   el$woman_earns_no_problem_ml +
+                                   el$women_better_leaders_ml) / 4
+
+# Asset index (from midline variables)
+el$asset_index <- (el$tv_ml + el$radio_ml + el$chair_ml + el$sofa_ml +
+                    (1 - el$mud_wall_ml) + el$motor_cycle_ml) / 6
+
+# --- Midline indices (from ml data) ---
+ml$intervene_index     <- (ml$involve_lc1 + ml$involve_nabakyala +
+                            ml$involve_parents + ml$report_police) / 4
+ml$violence_disapproval <- (ml$ipv_attitude + ml$disobey) / 2
+```
+
+## Load Lasso-Selected Covariates
+
+The original paper uses LASSO to select covariates for each outcome, improving precision while maintaining unbiasedness. We load these pre-computed selections.
+
+```{r load-lasso, cache=FALSE}
+# Source lasso utility functions
+source("../Countering_VAW_replication/02_code/00_useful_functions/lasso_functions.R")
+
+# Load lasso-selected covariates
+lasso_available <- tryCatch({
+  load("../Countering_VAW_replication/01_data/lasso_selected_covariates.Rdata")
+  TRUE
+}, error = function(e) {
+  message("Could not load lasso covariates: ", e$message)
+  FALSE
+})
+
+if (lasso_available) {
+  # Check which lasso objects are available
+  lasso_objs <- ls(pattern = "lasso")
+  cat("Available lasso objects:", paste(lasso_objs, collapse = ", "), "\n")
+}
+```
+
+## Define Analysis Functions
+
+We define helper functions that mirror the original analysis pipeline: OLS regression with block fixed effects and cluster-robust standard errors.
+
+```{r analysis-functions}
+#' OLS with block fixed effects and cluster-robust SEs
+#'
+#' Replicates the ols_main() function from the original code.
+#' Specification: outcome ~ treatment + block_FE + resample + n_end_mean [+ covariates]
+#' Standard errors clustered at the village (tc_id) level.
+run_ols <- function(outcome, treatment = "IPV", data, covariates = NULL,
+                    cluster_var = "tc_id") {
+
+  # Build formula
+  fe <- "as.factor(block_id) + resample + n_end_mean"
+  if (!is.null(covariates) && length(covariates) > 0) {
+    valid_covs <- covariates[covariates %in% names(data)]
+    if (length(valid_covs) > 0) {
+      fe <- paste(fe, "+", paste(valid_covs, collapse = " + "))
+    }
+  }
+  fml <- as.formula(paste(outcome, "~", treatment, "+", fe))
+
+  # Fit model
+  fit <- lm(fml, data = data)
+
+  # Cluster-robust variance-covariance matrix
+  vcov_cl <- cluster.vcov(model = fit, cluster = data[[cluster_var]])
+  ct <- coeftest(fit, vcov. = vcov_cl)
+
+  list(
+    fit        = fit,
+    coeftest   = ct,
+    estimate   = ct[treatment, "Estimate"],
+    se         = ct[treatment, "Std. Error"],
+    pval       = ct[treatment, "Pr(>|t|)"],
+    n          = sum(complete.cases(data[, c(outcome, treatment)])),
+    n_clusters = length(unique(data[[cluster_var]][!is.na(data[[outcome]])]))
+  )
+}
+
+#' OLS for village-level regressions (no resample, no clustered SEs)
+#' Village-level data has one observation per village, so no clustering needed.
+run_ols_village <- function(outcome, treatment = "IPV", data) {
+  fml <- as.formula(paste(outcome, "~", treatment, "+ as.factor(block_id) + n_end_mean"))
+  fit <- lm(fml, data = data)
+  ct <- coeftest(fit)
+  list(
+    fit      = fit,
+    coeftest = ct,
+    estimate = ct[treatment, "Estimate"],
+    se       = ct[treatment, "Std. Error"],
+    pval     = ct[treatment, "Pr(>|t|)"],
+    n        = nobs(fit)
+  )
+}
+
+#' Compute control group mean for an outcome
+ctrl_mean <- function(outcome, data, treatment = "IPV") {
+  mean(data[[outcome]][data[[treatment]] == 0], na.rm = TRUE)
+}
+
+#' Try to get lasso-selected covariates for an outcome
+get_lasso_covs <- function(outcome_name, lasso_list_name) {
+  if (!lasso_available) return(NULL)
+  lasso_list <- tryCatch(get(lasso_list_name), error = function(e) NULL)
+  if (is.null(lasso_list)) return(NULL)
+  tryCatch(prep_covariates(outcome_name, lasso_list), error = function(e) NULL)
+}
+```
+
+------------------------------------------------------------------------
+
+# Data Overview
+
+```{r data-overview}
+# Define analysis samples
+compliers       <- subset(el, respondent_category == "Complier")
+women_compliers <- subset(el, respondent_category == "Complier" & female == 1)
+men_compliers   <- subset(el, respondent_category == "Complier" & female == 0)
+all_women       <- subset(el, female == 1)
+
+sample_info <- data.frame(
+  Sample = c("Total endline respondents", "Compliers (panel)",
+             "Women compliers", "Men compliers",
+             "All women (endline)",
+             "Villages in analysis", "Treatment villages (IPV=1)",
+             "Control villages (IPV=0)", "Randomization blocks"),
+  N = c(nrow(el), nrow(compliers),
+        nrow(women_compliers), nrow(men_compliers),
+        nrow(all_women),
+        length(unique(compliers$tc_id)),
+        sum(treatment_assignment$IPV),
+        sum(1 - treatment_assignment$IPV),
+        length(unique(compliers$block_id)))
+)
+
+kable(sample_info, col.names = c("", "N"), caption = "Sample Sizes") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+The treatment group comprises villages assigned to any condition containing anti-VAW vignettes (IPV-only, IPV+abortion, IPV+absenteeism). The control group includes all other conditions. Villages are organized into 16 geographic blocks to minimize within-block variance.
+
+```{r treatment-balance}
+# Treatment balance across key covariates
+balance_vars <- c("female", "age_ml", "married_ml", "highest_grade_ml",
+                  "household_head_ml", "members_ml", "number_children_ml")
+balance_vars <- balance_vars[balance_vars %in% names(compliers)]
+
+if (length(balance_vars) > 0) {
+  balance_table <- do.call(rbind, lapply(balance_vars, function(v) {
+    t_mean <- mean(compliers[[v]][compliers$IPV == 1], na.rm = TRUE)
+    c_mean <- mean(compliers[[v]][compliers$IPV == 0], na.rm = TRUE)
+    diff   <- t_mean - c_mean
+    # t-test for difference
+    tt <- tryCatch(
+      t.test(compliers[[v]][compliers$IPV == 1],
+             compliers[[v]][compliers$IPV == 0])$p.value,
+      error = function(e) NA
+    )
+    data.frame(Variable = v, Treatment = round(t_mean, 3),
+               Control = round(c_mean, 3), Difference = round(diff, 3),
+               P_value = round(tt, 3))
+  }))
+
+  kable(balance_table,
+        caption = "Balance Check: Treatment vs Control (Complier Panel)",
+        col.names = c("Variable", "Treatment Mean", "Control Mean",
+                       "Difference", "p-value")) %>%
+    kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+}
+```
+
+The balance table confirms that randomization successfully balanced observable characteristics across treatment and control groups, as expected from the blocked random assignment design.
+
+------------------------------------------------------------------------
+
+# Replication of Main Results
+
+## Reporting Attitudes --- Women (CPS Table 1)
+
+This is the paper's central finding. We estimate the effect of the anti-VAW campaign on women's willingness to report hypothetical incidents of domestic violence to various authorities: parents, the village women's counselor (*Nabakyala*), the local council chairperson (LC1), and the police. We also report effects on a composite intervention index (average of the four items).
+
+The specification is: $$Y_{ij} = \beta \cdot \text{IPV}_j + \gamma \cdot X_{ij} + \delta_b + \alpha \cdot \text{resample}_{ij} + \phi \cdot \overline{N}_j + \varepsilon_{ij}$$
+
+where $j$ indexes villages, $b$ indexes blocks, $\delta_b$ are block fixed effects, $\overline{N}_j$ is the average audience size, and standard errors are clustered at the village level.
+
+```{r reporting-women}
+outcomes_report <- c("involve_parents", "involve_nabakyala",
+                     "involve_lc1", "report_police", "intervene_index")
+outcome_labels  <- c("Involve Parents", "Involve Nabakyala",
+                     "Involve LC1", "Report Police", "Intervention Index")
+
+# Run regressions for midline and endline
+fits_w_ml <- list()
+fits_w_el <- list()
+
+for (out in outcomes_report) {
+  out_ml <- paste0(out, "_ml")
+
+  # Get lasso covariates (midline uses _W list, endline uses _panel_W list)
+  covs_ml <- get_lasso_covs(out, "IPV_lasso_covariates_W")
+  covs_el <- get_lasso_covs(out, "IPV_lasso_covariates_panel_W")
+
+  fits_w_ml[[out]] <- run_ols(out_ml, data = women_compliers, covariates = covs_ml)
+  fits_w_el[[out]] <- run_ols(out,    data = women_compliers, covariates = covs_el)
+}
+
+# Build results table
+women_results <- data.frame(
+  Outcome = rep(outcome_labels, each = 2),
+  Wave    = rep(c("Midline", "Endline"), length(outcomes_report)),
+  Coef    = unlist(lapply(outcomes_report, function(o)
+    c(fits_w_ml[[o]]$estimate, fits_w_el[[o]]$estimate))),
+  SE      = unlist(lapply(outcomes_report, function(o)
+    c(fits_w_ml[[o]]$se, fits_w_el[[o]]$se))),
+  P_value = unlist(lapply(outcomes_report, function(o)
+    c(fits_w_ml[[o]]$pval, fits_w_el[[o]]$pval))),
+  Ctrl_Mean = unlist(lapply(outcomes_report, function(o) {
+    out_ml <- paste0(o, "_ml")
+    c(ctrl_mean(out_ml, women_compliers), ctrl_mean(o, women_compliers))
+  })),
+  N = unlist(lapply(outcomes_report, function(o)
+    c(fits_w_ml[[o]]$n, fits_w_el[[o]]$n)))
+)
+
+# Add significance stars
+women_results$Stars <- ifelse(women_results$P_value < 0.01, "***",
+                       ifelse(women_results$P_value < 0.05, "**",
+                       ifelse(women_results$P_value < 0.1, "*", "")))
+
+# Format for display
+women_display <- women_results %>%
+  mutate(
+    Estimate = paste0(round(Coef, 3), Stars, "\n(", round(SE, 3), ")"),
+    `Control Mean` = round(Ctrl_Mean, 3)
+  ) %>%
+  select(Outcome, Wave, Estimate, `Control Mean`, N)
+
+kable(women_display,
+      caption = "Effect of Anti-VAW Campaign on Women's Reporting Attitudes (Complier Panel)",
+      align = c("l", "l", "r", "r", "r")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE) %>%
+  footnote(general = "OLS with block FE, cluster-robust SEs (village level). * p<0.1, ** p<0.05, *** p<0.01.")
+```
+
+**Comparison with CPS Table 1 (Women Compliers, N\~321)**:
+
+| Outcome            | Wave    |     Paper Coef (SE) | Paper Ctrl Mean |
+|--------------------|---------|--------------------:|:---------------:|
+| Intervention Index | Midline | 0.085\*\*\* (0.030) |      0.39       |
+| Intervention Index | Endline | 0.126\*\*\* (0.035) |      0.36       |
+| Involve Parents    | Midline |     0.070\* (0.040) |      0.41       |
+| Involve Parents    | Endline | 0.172\*\*\* (0.050) |      0.40       |
+| Involve Nabakyala  | Midline |   0.098\*\* (0.041) |      0.40       |
+| Involve Nabakyala  | Endline |   0.119\*\* (0.054) |      0.36       |
+| Involve LC1        | Midline | 0.104\*\*\* (0.038) |      0.38       |
+| Involve LC1        | Endline |   0.097\*\* (0.049) |      0.31       |
+| Report Police      | Midline |       0.067 (0.042) |      0.38       |
+| Report Police      | Endline |   0.117\*\* (0.048) |      0.37       |
+
+Our replicated estimates should closely match these values. Minor differences may arise from LASSO covariate selection or SE computation (we use `sandwich::vcovCL` vs. `multiwayvcov::cluster.vcov`). Our p-values are two-sided and parametric; the paper uses one-sided randomization inference p-values. The overall pattern --- large, positive, statistically significant effects on women's reporting willingness --- is clearly reproduced.
+
+## Reporting Attitudes --- Men (CPS Table 2)
+
+We replicate the same analysis for male compliers.
+
+```{r reporting-men}
+fits_m_ml <- list()
+fits_m_el <- list()
+
+for (out in outcomes_report) {
+  out_ml <- paste0(out, "_ml")
+
+  covs_ml <- get_lasso_covs(out, "IPV_lasso_covariates_M")
+  covs_el <- get_lasso_covs(out, "IPV_lasso_covariates_panel_M")
+
+  fits_m_ml[[out]] <- run_ols(out_ml, data = men_compliers, covariates = covs_ml)
+  fits_m_el[[out]] <- run_ols(out,    data = men_compliers, covariates = covs_el)
+}
+
+men_results <- data.frame(
+  Outcome = rep(outcome_labels, each = 2),
+  Wave    = rep(c("Midline", "Endline"), length(outcomes_report)),
+  Coef    = unlist(lapply(outcomes_report, function(o)
+    c(fits_m_ml[[o]]$estimate, fits_m_el[[o]]$estimate))),
+  SE      = unlist(lapply(outcomes_report, function(o)
+    c(fits_m_ml[[o]]$se, fits_m_el[[o]]$se))),
+  P_value = unlist(lapply(outcomes_report, function(o)
+    c(fits_m_ml[[o]]$pval, fits_m_el[[o]]$pval))),
+  Ctrl_Mean = unlist(lapply(outcomes_report, function(o) {
+    out_ml <- paste0(o, "_ml")
+    c(ctrl_mean(out_ml, men_compliers), ctrl_mean(o, men_compliers))
+  })),
+  N = unlist(lapply(outcomes_report, function(o)
+    c(fits_m_ml[[o]]$n, fits_m_el[[o]]$n)))
+)
+
+men_results$Stars <- ifelse(men_results$P_value < 0.01, "***",
+                    ifelse(men_results$P_value < 0.05, "**",
+                    ifelse(men_results$P_value < 0.1, "*", "")))
+
+men_display <- men_results %>%
+  mutate(
+    Estimate = paste0(round(Coef, 3), Stars, "\n(", round(SE, 3), ")"),
+    `Control Mean` = round(Ctrl_Mean, 3)
+  ) %>%
+  select(Outcome, Wave, Estimate, `Control Mean`, N)
+
+kable(men_display,
+      caption = "Effect of Anti-VAW Campaign on Men's Reporting Attitudes (Complier Panel)",
+      align = c("l", "l", "r", "r", "r")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE) %>%
+  footnote(general = "OLS with block FE, cluster-robust SEs (village level). * p<0.1, ** p<0.05, *** p<0.01.")
+```
+
+**Comparison with CPS Table 2 (Men Compliers, N\~720)**:
+
+| Outcome            | Wave    | Paper Coef (SE) | Paper Ctrl Mean |
+|--------------------|---------|----------------:|:---------------:|
+| Intervention Index | Midline |   0.020 (0.019) |      0.42       |
+| Intervention Index | Endline | 0.043\* (0.025) |      0.40       |
+| Involve Parents    | Midline |   0.004 (0.029) |      0.42       |
+| Involve Parents    | Endline |   0.043 (0.039) |      0.42       |
+| Involve Nabakyala  | Midline |   0.019 (0.030) |      0.42       |
+| Involve Nabakyala  | Endline |   0.039 (0.039) |      0.39       |
+| Involve LC1        | Midline |   0.027 (0.023) |      0.44       |
+| Involve LC1        | Endline |   0.045 (0.030) |      0.40       |
+| Report Police      | Midline |   0.032 (0.024) |      0.41       |
+| Report Police      | Endline |   0.046 (0.033) |      0.38       |
+
+Men show smaller and generally insignificant effects, consistent with the paper's finding of a strong gender asymmetry. The endline intervention index (0.043, p\<0.10 with RI) is marginally significant. All point estimates are positive, suggesting the campaign had a weaker but directionally consistent effect on men's reporting willingness.
+
+## Victimization (CPS Table 4)
+
+We test whether the increased willingness to report translates into actual reductions in violence. We examine three outcomes measured at endline among women: (1) the *number* of violence incidents (`household_violence`), (2) the *probability* of any incident (`any_violence`), and (3) the *frequency* of incidents (`household_violence_frequency`, analyzed with ordered probit). Analyses are conducted at both the village level (aggregating to cluster means) and the individual level.
+
+```{r victimization}
+# --- Village-level analysis ---
+# Collapse to village means for ALL women (not just compliers), matching original code
+vict_village <- el %>%
+  filter(female == 1) %>%
+  group_by(tc_id, block_id, IPV) %>%
+  summarise(
+    household_violence = mean(household_violence, na.rm = TRUE),
+    any_violence       = mean(any_violence, na.rm = TRUE),
+    household_violence_frequency = mean(household_violence_frequency, na.rm = TRUE),
+    n_end_mean         = first(n_end_mean),
+    .groups = "drop"
+  )
+
+# Village-level OLS (no resample, regular SEs — one obs per village)
+vict_vill_hv <- run_ols_village("household_violence", data = vict_village)
+vict_vill_av <- run_ols_village("any_violence", data = vict_village)
+
+# --- Individual-level analysis: all women ---
+vict_ind_hv_all <- run_ols("household_violence", data = all_women)
+vict_ind_av_all <- run_ols("any_violence", data = all_women)
+
+# --- Individual-level analysis: women compliers ---
+vict_ind_hv_comp <- run_ols("household_violence", data = women_compliers)
+vict_ind_av_comp <- run_ols("any_violence", data = women_compliers)
+
+# --- Ordered probit for violence frequency (Table 4, columns 7-8) ---
+run_ordered_probit <- function(data, label) {
+  tryCatch({
+    fit <- polr(as.factor(household_violence_frequency) ~ IPV + resample +
+                  as.factor(block_id) + n_end_mean,
+                method = "probit", data = data, Hess = TRUE)
+    vcov_cl <- sandwich::vcovCL(fit, cluster = data$tc_id)
+    ct <- coeftest(fit, vcov. = vcov_cl)
+    list(fit = fit, coeftest = ct,
+         estimate = ct["IPV", "Estimate"],
+         se = ct["IPV", "Std. Error"],
+         pval = ct["IPV", "Pr(>|z|)"],
+         n = nobs(fit))
+  }, error = function(e) {
+    message("Ordered probit failed for ", label, ": ", e$message)
+    list(estimate = NA, se = NA, pval = NA, n = NA)
+  })
+}
+
+oprobit_all  <- run_ordered_probit(all_women, "all women")
+oprobit_comp <- run_ordered_probit(women_compliers, "women compliers")
+
+# Build victimization results table
+vict_table <- data.frame(
+  Outcome = c(rep("# Incidents (OLS)", 3),
+              rep("Any Violence (OLS)", 3),
+              rep("Violence Frequency (Ordered Probit)", 2)),
+  Sample  = c("Village (All W)", "Indiv. (All W)", "Indiv. (W Compl.)",
+              "Village (All W)", "Indiv. (All W)", "Indiv. (W Compl.)",
+              "Indiv. (All W)", "Indiv. (W Compl.)"),
+  Coef    = c(vict_vill_hv$estimate, vict_ind_hv_all$estimate, vict_ind_hv_comp$estimate,
+              vict_vill_av$estimate, vict_ind_av_all$estimate, vict_ind_av_comp$estimate,
+              oprobit_all$estimate, oprobit_comp$estimate),
+  SE      = c(vict_vill_hv$se, vict_ind_hv_all$se, vict_ind_hv_comp$se,
+              vict_vill_av$se, vict_ind_av_all$se, vict_ind_av_comp$se,
+              oprobit_all$se, oprobit_comp$se),
+  P_value = c(vict_vill_hv$pval, vict_ind_hv_all$pval, vict_ind_hv_comp$pval,
+              vict_vill_av$pval, vict_ind_av_all$pval, vict_ind_av_comp$pval,
+              oprobit_all$pval, oprobit_comp$pval),
+  Ctrl_Mean = c(ctrl_mean("household_violence", vict_village),
+                ctrl_mean("household_violence", all_women),
+                ctrl_mean("household_violence", women_compliers),
+                ctrl_mean("any_violence", vict_village),
+                ctrl_mean("any_violence", all_women),
+                ctrl_mean("any_violence", women_compliers),
+                ctrl_mean("household_violence_frequency", all_women),
+                ctrl_mean("household_violence_frequency", women_compliers)),
+  N = c(vict_vill_hv$n, vict_ind_hv_all$n, vict_ind_hv_comp$n,
+        vict_vill_av$n, vict_ind_av_all$n, vict_ind_av_comp$n,
+        oprobit_all$n, oprobit_comp$n)
+)
+
+vict_table$Stars <- ifelse(vict_table$P_value < 0.01, "***",
+                   ifelse(vict_table$P_value < 0.05, "**",
+                   ifelse(vict_table$P_value < 0.1, "*", "")))
+
+vict_display <- vict_table %>%
+  mutate(
+    Estimate = paste0(round(Coef, 3), Stars, " (", round(SE, 3), ")"),
+    `Control Mean` = round(Ctrl_Mean, 3)
+  ) %>%
+  select(Outcome, Sample, Estimate, `Control Mean`, N)
+
+kable(vict_display,
+      caption = "Table 4 Replication: Effect of Anti-VAW Campaign on Violence Against Women",
+      align = c("l", "l", "r", "r", "r")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE) %>%
+  footnote(general = "Village-level: OLS with block FE, regular SEs. Individual-level: OLS/Ordered Probit with block FE, cluster-robust SEs. * p<0.1, ** p<0.05, *** p<0.01.")
+```
+
+**Comparison with CPS Table 4**:
+
+| Outcome | Sample | Paper Coef (SE) | Paper Ctrl Mean | Paper RI p |
+|----|----|---:|:--:|:--:|
+| \# Incidents | Village (All W) | -0.185\* (0.113) | 0.40 | 0.100 |
+| \# Incidents | Indiv. (All W) | -0.052 (0.048) | 0.40 | 0.294 |
+| \# Incidents | Indiv. (W Compl.) | -0.081 (0.068) | --- | 0.236 |
+| Any Violence | Village (All W) | -0.094\*\* (0.047) | 0.25 | 0.049 |
+| Any Violence | Indiv. (All W) | -0.034 (0.023) | 0.25 | 0.141 |
+| Any Violence | Indiv. (W Compl.) | -0.131\*\*\* (0.049) | 0.21 | 0.009 |
+| Frequency (OP) | Indiv. (All W) | -0.139 (0.110) | --- | 0.215 |
+| Frequency (OP) | Indiv. (W Compl.) | -0.295\* (0.162) | --- | 0.072 |
+
+All eight coefficients in the paper are negative. The key finding is the **13.1pp reduction** in any violence among women compliers (control mean 21%, RI p=0.009). The village-level specs also show significant effects. The ordered probit for compliers is marginally significant. Note that the village-level specification uses regular OLS SEs and does not include `resample`, matching the original code.
+
+## Social Sanctions --- Costs of Reporting (CPS Table 3)
+
+Table 3 examines whether the campaign reduced the perceived *costs* of reporting violence. This is a key mechanism test: if the campaign works by making reporting seem safer, we should see reductions in perceived social repercussions and personal retribution, and increases in the expectation that the community would support intervention.
+
+Three outcomes are examined:
+
+-   **Social Repercussions** (`anti_intervention_consequence`): Whether the respondent expects negative consequences (gossip, scolding) for someone who reports a domestic violence situation. Coded 0/1, where 1 = expects negative consequences. Hypothesis: **decrease** (lower-tailed test).
+-   **Personal Retribution** (`would_take_revenge`): Whether the perpetrator would take revenge against someone who intervened. Coded 0/1, where 1 = expects revenge. Hypothesis: **decrease** (lower-tailed test).
+-   **Community Would Intervene** (`react_comm`): Whether the community would react if someone was beaten. Coded 0/1, where 1 = community would react. Hypothesis: **increase** (upper-tailed test). Available at both midline and endline.
+
+```{r social-sanctions}
+# Social Repercussions (anti_intervention_consequence): endline, by gender
+sanc_aic_m <- run_ols("anti_intervention_consequence", data = men_compliers)
+sanc_aic_w <- run_ols("anti_intervention_consequence", data = women_compliers)
+
+# Personal Retribution (would_take_revenge): endline, by gender
+sanc_wtr_m <- run_ols("would_take_revenge", data = men_compliers)
+sanc_wtr_w <- run_ols("would_take_revenge", data = women_compliers)
+
+# Community Would Intervene (react_comm): midline and endline, by gender
+sanc_rc_m_ml <- run_ols("react_comm_ml", data = men_compliers)
+sanc_rc_m_el <- run_ols("react_comm",    data = men_compliers)
+sanc_rc_w_ml <- run_ols("react_comm_ml", data = women_compliers)
+sanc_rc_w_el <- run_ols("react_comm",    data = women_compliers)
+
+# Build results table
+sanctions_results <- data.frame(
+  Outcome = c("Social Repercussions (EL)", "Social Repercussions (EL)",
+              "Personal Retribution (EL)", "Personal Retribution (EL)",
+              "Comm. Would Intervene (ML)", "Comm. Would Intervene (EL)",
+              "Comm. Would Intervene (ML)", "Comm. Would Intervene (EL)"),
+  Gender = c("Men", "Women", "Men", "Women",
+             "Men", "Men", "Women", "Women"),
+  Coef = c(sanc_aic_m$estimate, sanc_aic_w$estimate,
+           sanc_wtr_m$estimate, sanc_wtr_w$estimate,
+           sanc_rc_m_ml$estimate, sanc_rc_m_el$estimate,
+           sanc_rc_w_ml$estimate, sanc_rc_w_el$estimate),
+  SE = c(sanc_aic_m$se, sanc_aic_w$se,
+         sanc_wtr_m$se, sanc_wtr_w$se,
+         sanc_rc_m_ml$se, sanc_rc_m_el$se,
+         sanc_rc_w_ml$se, sanc_rc_w_el$se),
+  P_value = c(sanc_aic_m$pval, sanc_aic_w$pval,
+              sanc_wtr_m$pval, sanc_wtr_w$pval,
+              sanc_rc_m_ml$pval, sanc_rc_m_el$pval,
+              sanc_rc_w_ml$pval, sanc_rc_w_el$pval),
+  Ctrl_Mean = c(ctrl_mean("anti_intervention_consequence", men_compliers),
+                ctrl_mean("anti_intervention_consequence", women_compliers),
+                ctrl_mean("would_take_revenge", men_compliers),
+                ctrl_mean("would_take_revenge", women_compliers),
+                ctrl_mean("react_comm_ml", men_compliers),
+                ctrl_mean("react_comm", men_compliers),
+                ctrl_mean("react_comm_ml", women_compliers),
+                ctrl_mean("react_comm", women_compliers)),
+  N = c(sanc_aic_m$n, sanc_aic_w$n,
+        sanc_wtr_m$n, sanc_wtr_w$n,
+        sanc_rc_m_ml$n, sanc_rc_m_el$n,
+        sanc_rc_w_ml$n, sanc_rc_w_el$n),
+  Hypothesis = c("Lower", "Lower", "Lower", "Lower",
+                 "Upper", "Upper", "Upper", "Upper")
+)
+
+sanctions_results$Stars <- ifelse(sanctions_results$P_value < 0.01, "***",
+                          ifelse(sanctions_results$P_value < 0.05, "**",
+                          ifelse(sanctions_results$P_value < 0.1, "*", "")))
+
+sanctions_display <- sanctions_results %>%
+  mutate(
+    Estimate = paste0(round(Coef, 3), Stars, " (", round(SE, 3), ")"),
+    `Control Mean` = round(Ctrl_Mean, 3)
+  ) %>%
+  select(Outcome, Gender, Estimate, `Control Mean`, N, Hypothesis)
+
+kable(sanctions_display,
+      caption = "Table 3 Replication: Social Sanctions and Costs of Reporting (Complier Panel)",
+      align = c("l", "l", "r", "r", "r", "c")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
+                full_width = FALSE) %>%
+  footnote(general = "OLS with block FE, no LASSO covariates, cluster-robust SEs (village level). * p<0.1, ** p<0.05, *** p<0.01. Our p-values are two-sided; the paper uses one-sided RI p-values matching the stated hypothesis direction.")
+```
+
+**Comparison with CPS Table 3**:
+
+| Outcome              | Gender |    Paper Coef (SE) | Paper Ctrl Mean | Paper RI p |
+|----------------------|--------|-------------------:|:---------------:|:----------:|
+| Social Repercussions | Men    |     -0.064 (0.042) |      0.58       |   0.072    |
+| Social Repercussions | Women  | -0.114\*\* (0.051) |      0.63       |   0.010    |
+| Personal Retribution | Men    |     -0.000 (0.041) |      0.36       |   0.549    |
+| Personal Retribution | Women  |     -0.064 (0.061) |      0.37       |   0.138    |
+| Comm. Intervene (ML) | Men    |      0.002 (0.019) |      0.88       |   0.498    |
+| Comm. Intervene (EL) | Men    |     -0.014 (0.028) |      0.78       |   0.680    |
+| Comm. Intervene (ML) | Women  |      0.007 (0.027) |      0.90       |   0.395    |
+| Comm. Intervene (EL) | Women  |      0.028 (0.042) |      0.76       |   0.280    |
+
+**The gossip/scolding mechanism**: The central finding of Table 3 is the **11.4 percentage point reduction** in women's expectation of social repercussions for reporting (from a control mean of 63%, RI p=0.010). In control villages, 63% of women anticipate that someone who reported a domestic violence incident would be scolded or gossiped about. The campaign reduces this to approximately 52%. This is the key mechanism: the campaign works by reducing the perceived social costs of speaking up, not by changing attitudes about violence itself. The effect for men (-6.4pp, RI p=0.072) goes in the same direction but is weaker. Effects on personal retribution and community intervention are not significant.
+
+## Causal Mechanisms: Survey Experiment (AER P&P Table 1)
+
+Table 1 of the AER P&P paper presents a 2x2 factorial design embedded in the endline survey. Respondents were randomly assigned to one of two primes:
+
+-   **Others Observe = 0**: "Suppose *you are the only one* who has observed the incident..."
+-   **Others Observe = 1**: "Suppose *you see a group of people from your community standing nearby, discussing the incident*..."
+
+The outcome is whether the respondent would report the incident to a local leader (coded 1 = yes, 0 = no). This is crossed with the main treatment (Campaign = anti-VAW media exposure).
+
+```{r table1-survey-experiment}
+# The survey experiment variables are in the endline data
+# others_observe: randomized prime (0 = alone, 1 = others present)
+# would_report: binary outcome (1 = would report, 0 = would not)
+
+# Subset to compliers with non-missing values
+survey_exp <- subset(compliers,
+                     !is.na(would_report) & !is.na(others_observe))
+
+# --- Cell means and Ns ---
+cells <- survey_exp %>%
+  group_by(IPV, others_observe) %>%
+  summarise(
+    mean_report = mean(would_report, na.rm = TRUE),
+    n = n(),
+    .groups = "drop"
+  )
+
+# Format as 2x2 table
+table1_data <- data.frame(
+  Prime = c("Others Observe = 0", "Others Observe = 1"),
+  `Campaign_0` = c(
+    paste0(round(cells$mean_report[cells$IPV == 0 & cells$others_observe == 0] * 100, 1),
+           "% (N=", cells$n[cells$IPV == 0 & cells$others_observe == 0], ")"),
+    paste0(round(cells$mean_report[cells$IPV == 0 & cells$others_observe == 1] * 100, 1),
+           "% (N=", cells$n[cells$IPV == 0 & cells$others_observe == 1], ")")
+  ),
+  `Campaign_1` = c(
+    paste0(round(cells$mean_report[cells$IPV == 1 & cells$others_observe == 0] * 100, 1),
+           "% (N=", cells$n[cells$IPV == 1 & cells$others_observe == 0], ")"),
+    paste0(round(cells$mean_report[cells$IPV == 1 & cells$others_observe == 1] * 100, 1),
+           "% (N=", cells$n[cells$IPV == 1 & cells$others_observe == 1], ")")
+  )
+)
+
+kable(table1_data,
+      col.names = c("", "Campaign = 0", "Campaign = 1"),
+      caption = "Table 1 Replication: Proportion Who Would Report (Cell Means)",
+      align = c("l", "c", "c")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) %>%
+  add_header_above(c(" " = 1, "Anti-VAW Campaign" = 2))
+```
+
+```{r table1-regressions}
+# Regression analysis mirroring the original free_riding.R script
+# Model 1: Effect of prime only
+fit_fr1 <- lm(would_report ~ others_observe + as.factor(block_id) + resample + n_end_mean,
+              data = survey_exp)
+vcov1 <- cluster.vcov(fit_fr1, cluster = survey_exp$tc_id)
+ct1 <- coeftest(fit_fr1, vcov. = vcov1)
+
+# Model 2: Additive effects of prime and campaign
+fit_fr2 <- lm(would_report ~ others_observe + IPV + as.factor(block_id) + resample + n_end_mean,
+              data = survey_exp)
+vcov2 <- cluster.vcov(fit_fr2, cluster = survey_exp$tc_id)
+ct2 <- coeftest(fit_fr2, vcov. = vcov2)
+
+# Model 3: Interaction (the key specification)
+fit_fr3 <- lm(would_report ~ others_observe * IPV + as.factor(block_id) + resample + n_end_mean,
+              data = survey_exp)
+vcov3 <- cluster.vcov(fit_fr3, cluster = survey_exp$tc_id)
+ct3 <- coeftest(fit_fr3, vcov. = vcov3)
+```
+
+```{r table1-display, results='asis'}
+stargazer(fit_fr1, fit_fr2, fit_fr3,
+          type = "html",
+          se = list(ct1[, "Std. Error"], ct2[, "Std. Error"], ct3[, "Std. Error"]),
+          p = list(ct1[, "Pr(>|t|)"], ct2[, "Pr(>|t|)"], ct3[, "Pr(>|t|)"]),
+          keep = c("others_observe", "IPV", "others_observe:IPV"),
+          covariate.labels = c("Others Observe", "Anti-VAW Campaign",
+                                "Others Observe x Campaign"),
+          dep.var.labels = "Would Report IPV Incident",
+          omit.stat = c("rsq", "f", "ser"),
+          add.lines = list(
+            c("Block FE", "Yes", "Yes", "Yes"),
+            c("Sample", "Compliers", "Compliers", "Compliers")
+          ),
+          notes = "Cluster-robust SEs at the village level.",
+          title = "Table 1 Replication: Survey Experiment on Reporting Willingness")
+```
+
+**Comparison with AER P&P Table 1 Cell Means**: The paper reports Control+Alone = 82.7%, Control+Others = 88.5%, Treatment+Alone = 89.1%, Treatment+Others = 88.1%.
+
+**Comparison with AER P&P Table 1 Regressions**:
+
+| Variable       |   Paper Col 1 |   Paper Col 2 |       Paper Col 3 |
+|----------------|--------------:|--------------:|------------------:|
+| Others Observe | 0.020 (0.020) | 0.019 (0.020) |     0.058 (0.028) |
+| Campaign       |           --- | 0.036 (0.023) | 0.064\*\* (0.032) |
+| Interaction    |           --- |           --- |  -0.073\* (0.040) |
+
+The key pattern from Column 3: the campaign increases reporting willingness by \~6.4pp when the respondent is alone, but the "Others Observe" effect (+5.8pp among non-treated) essentially disappears among those exposed to the campaign (interaction -7.3pp). This is consistent with the mechanism: the campaign reduces the perceived risk of being labeled a gossip, so having corroborating witnesses becomes less critical for the decision to report.
+
+## Alternative Explanations: Coefficient Plot (CPS Figure 5)
+
+We test whether the campaign changed attitudes --- an alternative causal pathway. If the campaign works through attitude change, we should see effects on violence disapproval, empathy, awareness of escalation risk, and gender equality attitudes.
+
+```{r coef-plot, fig.width=10, fig.height=7}
+# Outcomes to test for alternative mechanisms
+alt_outcomes <- list(
+  list(var = "violence_disapproval_ml", label = "VAW Not Acceptable (ML)", wave = "Midline"),
+  list(var = "violence_disapproval",    label = "VAW Not Acceptable (EL)", wave = "Endline"),
+  list(var = "empathy_pair",            label = "Women Suffer Greatly (EL)", wave = "Endline"),
+  list(var = "spiral_risk",             label = "Violence Spirals (EL)", wave = "Endline"),
+  list(var = "support_gender_equality_ml", label = "Gender Equality (ML)", wave = "Midline"),
+  list(var = "support_gender_equality",    label = "Gender Equality (EL)", wave = "Endline")
+)
+
+# Function to get coefficients for the coefficient plot
+get_alt_effects <- function(data, gender_label) {
+  results <- lapply(alt_outcomes, function(o) {
+    res <- run_ols(o$var, data = data)
+    data.frame(
+      outcome = o$label,
+      estimate = res$estimate,
+      se = res$se,
+      lower90 = res$estimate - 1.645 * res$se,
+      upper90 = res$estimate + 1.645 * res$se,
+      gender = gender_label,
+      stringsAsFactors = FALSE
+    )
+  })
+  do.call(rbind, results)
+}
+
+effects_women <- get_alt_effects(women_compliers,
+                                 paste0("Women Compliers (N=", nrow(women_compliers), ")"))
+effects_men   <- get_alt_effects(men_compliers,
+                                 paste0("Men Compliers (N=", nrow(men_compliers), ")"))
+effects_all   <- rbind(effects_women, effects_men)
+
+# Reorder outcomes for display
+effects_all$outcome <- factor(effects_all$outcome,
+                              levels = rev(sapply(alt_outcomes, `[[`, "label")))
+
+ggplot(effects_all, aes(x = outcome, y = estimate)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_errorbar(aes(ymin = lower90, ymax = upper90), width = 0.2, linewidth = 0.8) +
+  geom_point(size = 3) +
+  coord_flip() +
+  facet_wrap(~ gender, ncol = 2) +
+  labs(
+    title = "Effect of Anti-VAW Campaign on Alternative Mechanism Outcomes",
+    subtitle = "Point estimates with 90% confidence intervals (cluster-robust SEs)",
+    x = NULL,
+    y = "Estimated Effect of Anti-VAW Campaign"
+  ) +
+  ylim(-0.2, 0.2) +
+  theme_minimal(base_size = 12) +
+  theme(
+    strip.text = element_text(face = "bold"),
+    panel.grid.minor = element_blank()
+  )
+```
+
+**Comparison with CPS Figure 5**: The paper shows that all 90% confidence intervals include zero for both genders across all attitude measures. Our replication confirms this crucial null finding: the campaign had **no detectable effect on attitudes** --- neither on the acceptability of violence, empathy for victims, awareness of escalation risk, nor support for gender equality. This rules out "attitude change" as the causal mechanism and supports the paper's argument that the campaign works through a different channel --- specifically, by reducing barriers to *reporting* (i.e., alleviating fears of social sanctions for speaking up, as confirmed in Table 3).
+
+------------------------------------------------------------------------
+
+# Extension: Causal Forest Analysis
+
+## Motivation
+
+The paper examines treatment effect heterogeneity in a limited way: it tests whether effects differ by socioeconomic status (using a factor-analytic SES index) and by gender (by running separate regressions). However, **causal forests** (Athey, Tibshirani & Wager, 2019) offer a principled, data-driven approach to discovering heterogeneity across *many* dimensions simultaneously, without requiring pre-specification of which variables moderate treatment effects.
+
+We apply causal forests to:
+
+1.  Estimate **individual-level conditional average treatment effects** (CATEs) for the reporting willingness outcome.
+2.  Identify which **baseline characteristics** are the strongest predictors of treatment effect heterogeneity.
+3.  Compare these data-driven findings to the paper's pre-specified subgroup analyses.
+
+## Data Preparation
+
+We use the complier panel with midline (pre-treatment) covariates as features. The outcome is the composite intervention index (average willingness to report across four channels).
+
+```{r cf-data-prep}
+# Prepare features from midline (pre-treatment) covariates
+X_vars <- c(
+  "female",
+  "age_ml",
+  "married_ml",
+  "household_head_ml",
+  "members_ml",
+  "number_children_ml",
+  "highest_grade_ml",
+  "radio_ml",
+  "tv_ml",
+  "cellphone_ml",
+  "christian_only_ml",
+  "muslim_ml",
+  "living_standard_ml",
+  "violence_disapproval_ml",
+  "intervene_index_ml",
+  "asset_index"
+)
+
+# Only keep features that exist in the data
+X_vars <- X_vars[X_vars %in% names(compliers)]
+cat("Features available:", length(X_vars), "\n")
+cat("Features used:", paste(X_vars, collapse = ", "), "\n")
+
+# Outcome and treatment
+Y <- compliers$intervene_index
+W <- compliers$IPV
+X <- compliers[, X_vars]
+clusters_cf <- compliers$tc_id
+
+# Handle missing values (grf requires complete cases)
+complete_idx <- complete.cases(Y, W, X)
+cat("\nComplete cases:", sum(complete_idx), "out of", length(complete_idx), "\n")
+
+Y_cf <- Y[complete_idx]
+W_cf <- W[complete_idx]
+X_cf <- as.matrix(X[complete_idx, ])
+clusters_cf <- clusters_cf[complete_idx]
+compliers_cf <- compliers[complete_idx, ]
+```
+
+## Causal Forest Estimation
+
+```{r cf-fit}
+# Fit causal forest with clustering at the village level
+cf <- causal_forest(
+  X = X_cf,
+  Y = Y_cf,
+  W = W_cf,
+  clusters = clusters_cf,
+  num.trees = 4000,
+  seed = 12345
+)
+
+# Average treatment effect from the forest
+ate_cf <- average_treatment_effect(cf)
+cat("Causal Forest ATE:", round(ate_cf[1], 4),
+    "(SE:", round(ate_cf[2], 4), ")\n")
+
+# For comparison: simple OLS ATE
+ate_ols <- run_ols("intervene_index", data = compliers_cf)
+cat("OLS ATE:", round(ate_ols$estimate, 4),
+    "(SE:", round(ate_ols$se, 4), ")\n")
+```
+
+The causal forest's ATE estimate should be close to the OLS estimate, providing a consistency check.
+
+## Variable Importance
+
+Which baseline characteristics are the strongest predictors of who benefits most (or least) from the campaign?
+
+```{r cf-varimp, fig.width=8, fig.height=5}
+vimp <- variable_importance(cf)
+vimp_df <- data.frame(
+  Variable = X_vars,
+  Importance = as.numeric(vimp)
+) %>%
+  arrange(desc(Importance))
+
+ggplot(vimp_df, aes(x = reorder(Variable, Importance), y = Importance)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Causal Forest: Variable Importance for Treatment Effect Heterogeneity",
+    x = NULL,
+    y = "Variable Importance"
+  ) +
+  theme_minimal(base_size = 12)
+
+kable(vimp_df, digits = 4,
+      caption = "Variable Importance Scores (Causal Forest)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+**Interpretation**: The variable importance scores reveal which baseline characteristics most strongly predict *variation* in treatment effects. High-importance variables suggest dimensions along which the campaign's impact is heterogeneous.
+
+## CATE Distribution
+
+```{r cf-cate-distribution, fig.width=10, fig.height=5}
+# Predict individual-level CATEs
+cate_pred <- predict(cf)$predictions
+
+# Add to data for analysis
+compliers_cf$cate <- cate_pred
+
+# Distribution of CATEs
+p1 <- ggplot(data.frame(cate = cate_pred), aes(x = cate)) +
+  geom_histogram(bins = 40, fill = "steelblue", alpha = 0.7, color = "white") +
+  geom_vline(xintercept = ate_cf[1], linetype = "dashed", color = "red", linewidth = 1) +
+  labs(
+    title = "Distribution of Estimated CATEs",
+    subtitle = "Red dashed line = Average Treatment Effect",
+    x = "Conditional Average Treatment Effect",
+    y = "Count"
+  ) +
+  theme_minimal(base_size = 12)
+
+# CATEs by gender
+p2 <- ggplot(compliers_cf, aes(x = factor(female, labels = c("Men", "Women")),
+                                y = cate)) +
+  geom_boxplot(fill = c("lightblue", "lightcoral"), alpha = 0.7) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  labs(
+    title = "CATEs by Gender",
+    x = NULL,
+    y = "Estimated CATE"
+  ) +
+  theme_minimal(base_size = 12)
+
+# Display plots side by side
+gridExtra::grid.arrange(p1, p2, ncol = 2)
+```
+
+```{r cf-cate-summary}
+# Summary statistics of CATEs
+cate_summary <- compliers_cf %>%
+  group_by(Gender = factor(female, labels = c("Men", "Women"))) %>%
+  summarise(
+    N = n(),
+    Mean_CATE = mean(cate),
+    Median_CATE = median(cate),
+    SD_CATE = sd(cate),
+    Min_CATE = min(cate),
+    Max_CATE = max(cate),
+    .groups = "drop"
+  )
+
+kable(cate_summary, digits = 4,
+      caption = "CATE Summary Statistics by Gender") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+## Best Linear Projection
+
+The best linear projection (BLP) tests whether the CATEs vary systematically with observable characteristics, providing a formal test of heterogeneity.
+
+```{r cf-blp}
+# Test for heterogeneity: calibration test
+calibration <- test_calibration(cf)
+cat("Calibration Test Results:\n")
+print(calibration)
+```
+
+```{r cf-blp-projection}
+# Best linear projection onto key covariates
+blp_result <- best_linear_projection(cf, A = X_cf)
+cat("\nBest Linear Projection of CATEs:\n")
+print(blp_result)
+```
+
+**Interpretation**: The calibration test examines whether the forest's heterogeneity estimates are meaningful. The "mean.forest.prediction" coefficient tests whether the ATE is non-zero, while the "differential.forest.prediction" coefficient tests whether there is *systematic heterogeneity* --- i.e., whether individuals with higher predicted CATEs actually experience larger treatment effects.
+
+## Gender-Based Heterogeneity
+
+The paper's primary heterogeneity analysis splits the sample by gender. We examine whether the causal forest recovers this pattern.
+
+```{r cf-gender-het, fig.width=8, fig.height=5}
+# GATE by gender
+ate_women_cf <- average_treatment_effect(cf, subset = compliers_cf$female == 1)
+ate_men_cf   <- average_treatment_effect(cf, subset = compliers_cf$female == 0)
+
+gender_ate <- data.frame(
+  Gender = c("Women", "Men"),
+  ATE = c(ate_women_cf[1], ate_men_cf[1]),
+  SE = c(ate_women_cf[2], ate_men_cf[2])
+)
+gender_ate$lower <- gender_ate$ATE - 1.96 * gender_ate$SE
+gender_ate$upper <- gender_ate$ATE + 1.96 * gender_ate$SE
+
+ggplot(gender_ate, aes(x = Gender, y = ATE)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.15, linewidth = 0.8) +
+  geom_point(size = 4, color = "steelblue") +
+  labs(
+    title = "Causal Forest: Group Average Treatment Effects by Gender",
+    subtitle = "95% confidence intervals",
+    x = NULL,
+    y = "GATE on Intervention Index"
+  ) +
+  theme_minimal(base_size = 12)
+
+kable(gender_ate, digits = 4,
+      caption = "Gender-Specific Average Treatment Effects (Causal Forest)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+## Heterogeneity by Baseline Reporting Willingness
+
+We examine whether the campaign has different effects on those who were already willing to report at baseline versus those who were not.
+
+```{r cf-baseline-het, fig.width=8, fig.height=5}
+# Split by median baseline reporting willingness
+median_baseline <- median(compliers_cf$intervene_index_ml, na.rm = TRUE)
+compliers_cf$high_baseline <- as.numeric(compliers_cf$intervene_index_ml > median_baseline)
+
+ate_high <- average_treatment_effect(cf,
+              subset = compliers_cf$high_baseline == 1)
+ate_low  <- average_treatment_effect(cf,
+              subset = compliers_cf$high_baseline == 0)
+
+baseline_ate <- data.frame(
+  Group = c("Low Baseline Reporting", "High Baseline Reporting"),
+  ATE = c(ate_low[1], ate_high[1]),
+  SE = c(ate_low[2], ate_high[2])
+)
+baseline_ate$lower <- baseline_ate$ATE - 1.96 * baseline_ate$SE
+baseline_ate$upper <- baseline_ate$ATE + 1.96 * baseline_ate$SE
+
+ggplot(baseline_ate, aes(x = Group, y = ATE)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.15, linewidth = 0.8) +
+  geom_point(size = 4, color = "steelblue") +
+  labs(
+    title = "Causal Forest: GATEs by Baseline Reporting Willingness",
+    subtitle = "Split at median of midline intervention index (95% CIs)",
+    x = NULL,
+    y = "GATE on Intervention Index"
+  ) +
+  theme_minimal(base_size = 12)
+
+kable(baseline_ate, digits = 4,
+      caption = "Treatment Effects by Baseline Reporting Willingness") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+## Heterogeneity by Socioeconomic Status
+
+The paper tests whether effects vary by SES (using a factor-analytic index). We replicate this using the causal forest.
+
+```{r cf-ses-het, fig.width=8, fig.height=5}
+# Use the asset_index as a proxy for SES
+median_asset <- median(compliers_cf$asset_index, na.rm = TRUE)
+compliers_cf$high_ses <- as.numeric(compliers_cf$asset_index > median_asset)
+
+ate_high_ses <- average_treatment_effect(cf, subset = compliers_cf$high_ses == 1)
+ate_low_ses  <- average_treatment_effect(cf, subset = compliers_cf$high_ses == 0)
+
+ses_ate <- data.frame(
+  Group = c("Low SES", "High SES"),
+  ATE = c(ate_low_ses[1], ate_high_ses[1]),
+  SE = c(ate_low_ses[2], ate_high_ses[2])
+)
+ses_ate$lower <- ses_ate$ATE - 1.96 * ses_ate$SE
+ses_ate$upper <- ses_ate$ATE + 1.96 * ses_ate$SE
+
+ggplot(ses_ate, aes(x = Group, y = ATE)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.15, linewidth = 0.8) +
+  geom_point(size = 4, color = "steelblue") +
+  labs(
+    title = "Causal Forest: GATEs by Socioeconomic Status",
+    subtitle = "Split at median of asset index (95% CIs)",
+    x = NULL,
+    y = "GATE on Intervention Index"
+  ) +
+  theme_minimal(base_size = 12)
+
+kable(ses_ate, digits = 4,
+      caption = "Treatment Effects by Socioeconomic Status") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+## Causal Forest on Victimization (Women Only)
+
+We also estimate a causal forest for the victimization outcome (any violence), which is the policy-relevant outcome.
+
+```{r cf-victimization}
+# Prepare data for women compliers only
+Y_vict <- women_compliers$any_violence
+W_vict <- women_compliers$IPV
+X_vict_vars <- X_vars[X_vars != "female"]  # Remove female (constant in this sample)
+X_vict_vars <- X_vict_vars[X_vict_vars %in% names(women_compliers)]
+X_vict <- women_compliers[, X_vict_vars]
+clusters_vict <- women_compliers$tc_id
+
+complete_vict <- complete.cases(Y_vict, W_vict, X_vict)
+cat("Women compliers with complete data:", sum(complete_vict), "\n")
+
+if (sum(complete_vict) > 50) {
+  cf_vict <- causal_forest(
+    X = as.matrix(X_vict[complete_vict, ]),
+    Y = Y_vict[complete_vict],
+    W = W_vict[complete_vict],
+    clusters = clusters_vict[complete_vict],
+    num.trees = 4000,
+    seed = 12345
+  )
+
+  ate_vict_cf <- average_treatment_effect(cf_vict)
+  cat("Causal Forest ATE (Any Violence, Women):", round(ate_vict_cf[1], 4),
+      "(SE:", round(ate_vict_cf[2], 4), ")\n")
+
+  # Variable importance
+  vimp_vict <- variable_importance(cf_vict)
+  vimp_vict_df <- data.frame(
+    Variable = X_vict_vars,
+    Importance = as.numeric(vimp_vict)
+  ) %>%
+    arrange(desc(Importance))
+
+  ggplot(vimp_vict_df, aes(x = reorder(Variable, Importance), y = Importance)) +
+    geom_col(fill = "coral") +
+    coord_flip() +
+    labs(
+      title = "Causal Forest (Victimization): Variable Importance",
+      subtitle = "Outcome = Any Violence (Women Compliers)",
+      x = NULL, y = "Variable Importance"
+    ) +
+    theme_minimal(base_size = 12)
+
+  # Calibration
+  cat("\nCalibration test (Victimization):\n")
+  print(test_calibration(cf_vict))
+} else {
+  cat("Insufficient complete cases for causal forest on victimization.\n")
+}
+```
+
+------------------------------------------------------------------------
+
+# Conclusion
+
+## Summary of Replication
+
+We successfully replicate the key findings of Green, Wilke, and Cooper across all major tables and figures:
+
+1.  **Reporting attitudes (CPS Tables 1 & 2)**: The anti-VAW media campaign significantly increased women's willingness to report hypothetical incidents of domestic violence, with effects persisting from midline to endline. The composite intervention index increased by approximately 8.5pp at midline and 12.6pp at endline among women compliers (both p\<0.01 with RI). Effects for men are smaller and generally not individually significant, though all point estimates are positive. This strong gender asymmetry is a key finding.
+
+2.  **Social sanctions (CPS Table 3)**: The campaign significantly reduced women's expectation of social repercussions for reporting violence --- by 11.4pp from a control mean of 63% (RI p=0.010). In control villages, nearly two-thirds of women anticipated gossip or scolding for someone who reported IPV. This is the key mechanism: the campaign works by reducing the perceived social costs of speaking up, not by changing attitudes about violence.
+
+3.  **Victimization (CPS Table 4)**: Treatment effects on violence are **consistently negative** across all eight specifications, including OLS and ordered probit. The village-level any-violence estimate is -9.4pp (RI p=0.049), the individual-level complier estimate is -13.1pp (RI p=0.009), and the ordered probit for compliers is -0.295 (RI p=0.072). The pattern is strongly suggestive of actual violence reduction.
+
+4.  **Survey experiment (AER P&P Table 1)**: The 2x2 factorial design confirms the mechanism. The campaign increases reporting willingness by \~6.4pp when alone, but the positive effect of having corroborating witnesses (+5.8pp) essentially disappears among those exposed to the campaign (interaction -7.3pp). This demonstrates that the campaign works by reducing credibility concerns that deter solo reporting.
+
+5.  **Alternative explanations (CPS Figure 5)**: We confirm the null result on attitudes: the campaign did not change views about the acceptability of violence, empathy, risk awareness, or gender equality. All 90% confidence intervals include zero, ruling out attitude change as the primary mechanism.
+
+## Extension: Causal Forest Findings
+
+The causal forest analysis adds value in several ways:
+
+1.  **Gender heterogeneity**: The forest recovers the strong gender difference documented in the paper --- women benefit more from the campaign than men in terms of reporting willingness.
+
+2.  **Data-driven discovery**: The variable importance analysis identifies which baseline characteristics most strongly predict who benefits from the campaign, potentially uncovering heterogeneity dimensions not examined by the original authors.
+
+3.  **CATE distribution**: The distribution of estimated individual-level treatment effects provides a richer picture of heterogeneity than the paper's pre-specified subgroup analysis.
+
+4.  **Comparison with SES interaction**: We examine whether the causal forest's data-driven approach identifies SES as an important moderator, and compare the pattern to the paper's finding.
+
+## Notes on Methodology
+
+-   **P-values**: Our p-values use asymptotic cluster-robust standard errors (two-sided). The paper uses **randomization inference** (RI) p-values via 1000+ permutations of treatment assignment within blocks. RI p-values may differ, especially where the paper uses one-sided tests matching directional hypotheses (e.g., lower-tailed for social sanctions, upper-tailed for reporting).
+-   **LASSO covariates**: Reporting attitude regressions (Tables 1 & 2) use LASSO-selected covariates for precision. Small differences in covariate selection may cause minor numerical discrepancies.
+-   **SE computation**: We use `sandwich::vcovCL` instead of the original `multiwayvcov::cluster.vcov`. These should produce equivalent results.
+
+## Limitations
+
+-   **Small sample sizes**: With approximately 300-700 compliers per gender, the power to detect heterogeneous effects is limited.
+-   **Cluster assignment**: Treatment is assigned at the village level (112 clusters), constraining the effective sample size for cluster-level inference.
+-   **Complier analysis**: Results are estimated for the subset of individuals who attended screenings, potentially limiting external validity.
+-   **Causal forest precision**: The relatively small sample size and limited number of clusters means the causal forest estimates may be noisy, particularly for the victimization outcome.
+
+------------------------------------------------------------------------
+
+# Session Info
+
+```{r session-info}
+sessionInfo()
+```

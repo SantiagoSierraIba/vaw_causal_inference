@@ -1,0 +1,23 @@
+# Ignore specific files per user request
+Causal Forest Material/
+Group Project - Instructions.pdf
+uganda women project.Rproj
+
+# R artifacts
+.Rhistory
+.Rdata
+.RData
+.Ruserdata
+**/.Rproj.user/
+
+# Claude Code
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Knit output (can be regenerated)
+replication/replication.html
+replication/replication_cache/
+replication/replication_files/
