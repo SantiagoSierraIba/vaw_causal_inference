@@ -145,40 +145,49 @@ point estimates match closely."
 **On screen:**
 
 -   Slide title: **"The campaign made women more willing to speak up"**
--   Simplified table comparing our replication to the paper (Women
-    Compliers, N=321):
+-   Two side by side tables comparing all 5 endline outcomes (our
+    replication vs. the paper):
 
-| Outcome (Women)             |  Our Estimate   | Paper Estimate  |
-|-----------------------------|:---------------:|:---------------:|
-| Involve Parents (EL)        |   0.144\*\*\*   |   0.172\*\*\*   |
-| Involve Nabakyala (EL)      |   0.158\*\*\*   |    0.119\*\*    |
-| Report to Police (EL)       |   0.130\*\*\*   |    0.117\*\*    |
-| **Intervention Index (EL)** | **0.126\*\*\*** | **0.126\*\*\*** |
+**Women Compliers (N = 321):**
 
--   Below: a second, smaller table for Men Compliers (N=720):
+| Outcome (Endline)      |  Our Estimate   | Paper Estimate  |
+|------------------------|:---------------:|:---------------:|
+| Involve Parents        |   0.144\*\*\*   |   0.144\*\*\*   |
+| Involve Counselor      |   0.158\*\*\*   |   0.171\*\*\*   |
+| Involve Village Leader |      0.041      |      0.060      |
+| Report to Police       |   0.130\*\*\*   |    0.130\*\*    |
+| **Intervention Index** | **0.126\*\*\*** | **0.126\*\*\*** |
 
-| Outcome (Men)               | Our Estimate | Paper Estimate |
-|-----------------------------|:------------:|:--------------:|
-| **Intervention Index (EL)** |   0.043\*    |    0.043\*     |
+**Men Compliers (N = 720):**
 
--   Visual emphasis: green checkmarks or "Replicated" badges
--   Footnote: "OLS with block FE, LASSO covariates, cluster-robust SEs.
+| Outcome (Endline)      | Our Estimate | Paper Estimate |
+|------------------------|:------------:|:--------------:|
+| Involve Parents        |    0.038     |     0.037      |
+| Involve Counselor      |   0.057\*    |    0.055\*     |
+| Involve Village Leader |    0.043     |   0.063\*\*    |
+| Report to Police       |    0.034     |     0.016      |
+| **Intervention Index** | **0.043\***  |  **0.043\***   |
+
+-   Footnote: "OLS with block FE, LASSO covariates, cluster robust SEs.
     \* p\<0.1, \*\* p\<0.05, \*\*\* p\<0.01 (parametric). Paper uses
     randomization inference."
 
-**Speaker notes:** "Starting with the paper's central result —
+**Speaker notes:** "Starting with the paper's central result,
 willingness to report domestic violence. Among women, the campaign
 produced strong, persistent effects. The composite intervention index,
-which averages willingness to involve parents, the village women's
-counselor, the local council chair, and the police, increased by 12.6
-percentage points at endline. Our replication matches the paper exactly
-on this measure. Across individual reporting channels, effects range
-from 13 to 16 percentage points — all highly significant. For men, the
-effects are smaller and only marginally significant — a 4.3 percentage
-point increase on the index. This gender asymmetry is consistent and one
-of the paper's key findings."
+which averages willingness to involve parents, the village counselor,
+the village leader, and the police, increased by 12.6 percentage points
+at endline. Our replication matches the paper exactly on this measure.
+Across individual reporting channels, effects range from 13 to 16
+percentage points, all highly significant. The one exception is
+involving the village leader, which shows no significant effect for
+either our replication or the paper. For men, the picture is very
+different. Most individual channels show no significant effects. Only
+the counselor channel and the composite index reach marginal
+significance at 4.3 percentage points. This gender asymmetry is one of
+the paper's key findings: the campaign works much better for women."
 
-**Transition:** "But what's really interesting is *why* this works — and
+**Transition:** "But what is really interesting is *why* this works, and
 whether it actually reduced violence."
 
 ------------------------------------------------------------------------
@@ -212,7 +221,7 @@ whether it actually reduced violence."
 
 | Outcome (Women)              | Our Estimate | Paper Estimate |
 |------------------------------|:------------:|:--------------:|
-| Any Violence (Village-level) | −0.071\*\*\* |   −0.094\*\*   |
+| Any Violence (Village-level) | −0.071\*\*\* |  −0.071\*\*\*  |
 | Any Violence (W. Compliers)  |  −0.131\*\*  |  −0.131\*\*\*  |
 
 -   Label: "13 percentage point reduction in violence among women
