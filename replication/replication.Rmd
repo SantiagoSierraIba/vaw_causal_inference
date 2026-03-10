@@ -395,6 +395,8 @@ kable(women_display,
 
 Our replicated estimates closely match these values. Minor differences may arise from LASSO covariate selection or SE computation (we use `sandwich::vcovCL` vs. `multiwayvcov::cluster.vcov`). Our p-values are two-sided and parametric; the paper uses one-sided randomization inference p-values. The overall pattern: large, positive, statistically significant effects on women's reporting willingness, is clearly reproduced.
 
+# Check this 👆🏻
+
 ## Reporting Attitudes --- Men (CPS Table 2)
 
 We replicate the same analysis for male compliers.
@@ -466,6 +468,7 @@ kable(men_display,
 | Intervention Index | Endline | 0.043\* (0.025) |      0.40       |
 
 Men show smaller and generally insignificant effects, consistent with the paper's finding of a strong gender asymmetry. The endline intervention index (0.043, p\<0.10 with RI) is marginally significant. All point estimates are positive, suggesting the campaign had a weaker but directionally consistent effect on men's reporting willingness.
+# Check this 👆🏻, we have considerably different results
 
 ## Victimization (CPS Table 4)
 
@@ -583,6 +586,8 @@ kable(vict_display,
 
 All eight coefficients in the paper are negative. The key finding is the **13.1pp reduction** in any violence among women compliers (control mean 21%, RI p=0.009). The village-level specs also show significant effects. The ordered probit for compliers is marginally significant. Note that the village-level specification uses regular OLS SEs and does not include `resample`, matching the original code.
 
+# Check this 👆🏻
+
 ## Social Sanctions --- Costs of Reporting (CPS Table 3)
 
 Table 3 examines whether the campaign reduced the perceived *costs* of reporting violence. This is a key mechanism test: if the campaign works by making reporting seem safer, we should see reductions in perceived social repercussions and personal retribution, and increases in the expectation that the community would support intervention.
@@ -592,6 +597,7 @@ Three outcomes are examined:
 -   **Social Repercussions** (`anti_intervention_consequence`): Whether the respondent expects negative consequences (gossip, scolding) for someone who reports a domestic violence situation. Coded 0/1, where 1 = expects negative consequences. Hypothesis: **decrease** (lower-tailed test).
 -   **Personal Retribution** (`would_take_revenge`): Whether the perpetrator would take revenge against someone who intervened. Coded 0/1, where 1 = expects revenge. Hypothesis: **decrease** (lower-tailed test).
 -   **Community Would Intervene** (`react_comm`): Whether the community would react if someone was beaten. Coded 0/1, where 1 = community would react. Hypothesis: **increase** (upper-tailed test). Available at both midline and endline.
+
 
 ```{r social-sanctions}
 # Social Repercussions (anti_intervention_consequence): endline, by gender
@@ -677,6 +683,8 @@ kable(sanctions_display,
 | Comm. Intervene (EL) | Women  |      0.028 (0.042) |      0.76       |   0.280    |
 
 **The gossip/scolding mechanism**: The central finding of Table 3 is the **11.4 percentage point reduction** in women's expectation of social repercussions for reporting (from a control mean of 63%, RI p=0.010). In control villages, 63% of women anticipate that someone who reported a domestic violence incident would be scolded or gossiped about. The campaign reduces this to approximately 52%. This is the key mechanism: the campaign works by reducing the perceived social costs of speaking up, not by changing attitudes about violence itself. The effect for men (-6.4pp, RI p=0.072) goes in the same direction but is weaker. Effects on personal retribution and community intervention are not significant.
+
+# Check this 👆🏻
 
 ## Causal Mechanisms: Survey Experiment (AER P&P Table 1)
 
@@ -781,6 +789,8 @@ stargazer(fit_fr1, fit_fr2, fit_fr3,
 
 The key pattern from Column 3: the campaign increases reporting willingness by \~6.4pp when the respondent is alone, but the "Others Observe" effect (+5.8pp among non-treated) essentially disappears among those exposed to the campaign (interaction -7.3pp). This is consistent with the mechanism: the campaign reduces the perceived risk of being labeled a gossip, so having corroborating witnesses becomes less critical for the decision to report.
 
+# Check this 👆🏻
+
 ## Alternative Explanations: Coefficient Plot (CPS Figure 5)
 
 We test whether the campaign changed attitudes --- an alternative causal pathway. If the campaign works through attitude change, we should see effects on violence disapproval, empathy, awareness of escalation risk, and gender equality attitudes.
@@ -845,6 +855,8 @@ ggplot(effects_all, aes(x = outcome, y = estimate)) +
 
 **Comparison with CPS Figure 5**: The paper shows that all 90% confidence intervals include zero for both genders across all attitude measures. Our replication confirms this crucial null finding: the campaign had **no detectable effect on attitudes** --- neither on the acceptability of violence, empathy for victims, awareness of escalation risk, nor support for gender equality. This rules out "attitude change" as the causal mechanism and supports the paper's argument that the campaign works through a different channel --- specifically, by reducing barriers to *reporting* (i.e., alleviating fears of social sanctions for speaking up, as confirmed in Table 3).
 
+# Check this 👆🏻
+
 ------------------------------------------------------------------------
 
 # Extension: Causal Forest Analysis
@@ -881,7 +893,8 @@ X_vars <- c(
   "living_standard_ml",
   "violence_disapproval_ml",
   "intervene_index_ml",
-  "asset_index"
+  "asset_index",
+  "n_end_mean"
 )
 
 # Only keep features that exist in the data

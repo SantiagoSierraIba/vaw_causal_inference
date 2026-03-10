@@ -2735,8 +2735,11 @@ p-values. The overall pattern: large, positive, statistically
 significant effects on women’s reporting willingness, is clearly
 reproduced.</p>
 </div>
-<div id="reporting-attitudes-men-cps-table-2" class="section level2" number="4.2">
-<h2><span class="header-section-number">4.2</span> Reporting Attitudes —
+</div>
+<div id="check-this" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Check this 👆🏻</h1>
+<div id="reporting-attitudes-men-cps-table-2" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Reporting Attitudes —
 Men (CPS Table 2)</h2>
 <p>We replicate the same analysis for male compliers.</p>
 <pre class="r"><code>fits_m_ml &lt;- list()
@@ -3075,10 +3078,11 @@ N~720)</strong>:</p>
 the paper’s finding of a strong gender asymmetry. The endline
 intervention index (0.043, p&lt;0.10 with RI) is marginally significant.
 All point estimates are positive, suggesting the campaign had a weaker
-but directionally consistent effect on men’s reporting willingness.</p>
+but directionally consistent effect on men’s reporting willingness. #
+Check this 👆🏻, we have considerably different results</p>
 </div>
-<div id="victimization-cps-table-4" class="section level2" number="4.3">
-<h2><span class="header-section-number">4.3</span> Victimization (CPS
+<div id="victimization-cps-table-4" class="section level2" number="5.2">
+<h2><span class="header-section-number">5.2</span> Victimization (CPS
 Table 4)</h2>
 <p>We test whether the increased willingness to report translates into
 actual reductions in violence. We examine three outcomes measured at
@@ -3444,8 +3448,11 @@ significant. Note that the village-level specification uses regular OLS
 SEs and does not include <code>resample</code>, matching the original
 code.</p>
 </div>
-<div id="social-sanctions-costs-of-reporting-cps-table-3" class="section level2" number="4.4">
-<h2><span class="header-section-number">4.4</span> Social Sanctions —
+</div>
+<div id="check-this-1" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Check this 👆🏻</h1>
+<div id="social-sanctions-costs-of-reporting-cps-table-3" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> Social Sanctions —
 Costs of Reporting (CPS Table 3)</h2>
 <p>Table 3 examines whether the campaign reduced the perceived
 <em>costs</em> of reporting violence. This is a key mechanism test: if
@@ -3832,8 +3839,11 @@ violence itself. The effect for men (-6.4pp, RI p=0.072) goes in the
 same direction but is weaker. Effects on personal retribution and
 community intervention are not significant.</p>
 </div>
-<div id="causal-mechanisms-survey-experiment-aer-pp-table-1" class="section level2" number="4.5">
-<h2><span class="header-section-number">4.5</span> Causal Mechanisms:
+</div>
+<div id="check-this-2" class="section level1" number="7">
+<h1><span class="header-section-number">7</span> Check this 👆🏻</h1>
+<div id="causal-mechanisms-survey-experiment-aer-pp-table-1" class="section level2" number="7.1">
+<h2><span class="header-section-number">7.1</span> Causal Mechanisms:
 Survey Experiment (AER P&amp;P Table 1)</h2>
 <p>Table 1 of the AER P&amp;P paper presents a 2x2 factorial design
 embedded in the endline survey. Respondents were randomly assigned to
@@ -4245,8 +4255,11 @@ with the mechanism: the campaign reduces the perceived risk of being
 labeled a gossip, so having corroborating witnesses becomes less
 critical for the decision to report.</p>
 </div>
-<div id="alternative-explanations-coefficient-plot-cps-figure-5" class="section level2" number="4.6">
-<h2><span class="header-section-number">4.6</span> Alternative
+</div>
+<div id="check-this-3" class="section level1" number="8">
+<h1><span class="header-section-number">8</span> Check this 👆🏻</h1>
+<div id="alternative-explanations-coefficient-plot-cps-figure-5" class="section level2" number="8.1">
+<h2><span class="header-section-number">8.1</span> Alternative
 Explanations: Coefficient Plot (CPS Figure 5)</h2>
 <p>We test whether the campaign changed attitudes — an alternative
 causal pathway. If the campaign works through attitude change, we should
@@ -4319,14 +4332,17 @@ argument that the campaign works through a different channel —
 specifically, by reducing barriers to <em>reporting</em> (i.e.,
 alleviating fears of social sanctions for speaking up, as confirmed in
 Table 3).</p>
+</div>
+</div>
+<div id="check-this-4" class="section level1" number="9">
+<h1><span class="header-section-number">9</span> Check this 👆🏻</h1>
 <hr />
 </div>
-</div>
-<div id="extension-causal-forest-analysis" class="section level1" number="5">
-<h1><span class="header-section-number">5</span> Extension: Causal
+<div id="extension-causal-forest-analysis" class="section level1" number="10">
+<h1><span class="header-section-number">10</span> Extension: Causal
 Forest Analysis</h1>
-<div id="motivation" class="section level2" number="5.1">
-<h2><span class="header-section-number">5.1</span> Motivation</h2>
+<div id="motivation" class="section level2" number="10.1">
+<h2><span class="header-section-number">10.1</span> Motivation</h2>
 <p>The paper examines treatment effect heterogeneity in a limited way:
 it tests whether effects differ by socioeconomic status (using a
 factor-analytic SES index) and by gender (by running separate
@@ -4345,8 +4361,9 @@ strongest predictors of treatment effect heterogeneity.</li>
 subgroup analyses.</li>
 </ol>
 </div>
-<div id="data-preparation" class="section level2" number="5.2">
-<h2><span class="header-section-number">5.2</span> Data Preparation</h2>
+<div id="data-preparation" class="section level2" number="10.2">
+<h2><span class="header-section-number">10.2</span> Data
+Preparation</h2>
 <p>We use the complier panel with midline (pre-treatment) covariates as
 features. The outcome is the composite intervention index (average
 willingness to report across four channels).</p>
@@ -4367,15 +4384,16 @@ X_vars &lt;- c(
   &quot;living_standard_ml&quot;,
   &quot;violence_disapproval_ml&quot;,
   &quot;intervene_index_ml&quot;,
-  &quot;asset_index&quot;
+  &quot;asset_index&quot;,
+  &quot;n_end_mean&quot;
 )
 
 # Only keep features that exist in the data
 X_vars &lt;- X_vars[X_vars %in% names(compliers)]
 cat(&quot;Features available:&quot;, length(X_vars), &quot;\n&quot;)</code></pre>
-<pre><code>## Features available: 16</code></pre>
+<pre><code>## Features available: 17</code></pre>
 <pre class="r"><code>cat(&quot;Features used:&quot;, paste(X_vars, collapse = &quot;, &quot;), &quot;\n&quot;)</code></pre>
-<pre><code>## Features used: female, age_ml, married_ml, household_head_ml, members_ml, number_children_ml, highest_grade_ml, radio_ml, tv_ml, cellphone_ml, christian_only_ml, muslim_ml, living_standard_ml, violence_disapproval_ml, intervene_index_ml, asset_index</code></pre>
+<pre><code>## Features used: female, age_ml, married_ml, household_head_ml, members_ml, number_children_ml, highest_grade_ml, radio_ml, tv_ml, cellphone_ml, christian_only_ml, muslim_ml, living_standard_ml, violence_disapproval_ml, intervene_index_ml, asset_index, n_end_mean</code></pre>
 <pre class="r"><code># Outcome and treatment
 Y &lt;- compliers$intervene_index
 W &lt;- compliers$IPV
@@ -4393,8 +4411,8 @@ X_cf &lt;- as.matrix(X[complete_idx, ])
 clusters_cf &lt;- clusters_cf[complete_idx]
 compliers_cf &lt;- compliers[complete_idx, ]</code></pre>
 </div>
-<div id="causal-forest-estimation" class="section level2" number="5.3">
-<h2><span class="header-section-number">5.3</span> Causal Forest
+<div id="causal-forest-estimation" class="section level2" number="10.3">
+<h2><span class="header-section-number">10.3</span> Causal Forest
 Estimation</h2>
 <pre class="r"><code># Fit causal forest with clustering at the village level
 cf &lt;- causal_forest(
@@ -4419,8 +4437,8 @@ cat(&quot;OLS ATE:&quot;, round(ate_ols$estimate, 4),
 <p>The causal forest’s ATE estimate should be close to the OLS estimate,
 providing a consistency check.</p>
 </div>
-<div id="variable-importance" class="section level2" number="5.4">
-<h2><span class="header-section-number">5.4</span> Variable
+<div id="variable-importance" class="section level2" number="10.4">
+<h2><span class="header-section-number">10.4</span> Variable
 Importance</h2>
 <p>Which baseline characteristics are the strongest predictors of who
 benefits most (or least) from the campaign?</p>
@@ -4595,8 +4613,8 @@ reveal which baseline characteristics most strongly predict
 suggest dimensions along which the campaign’s impact is
 heterogeneous.</p>
 </div>
-<div id="cate-distribution" class="section level2" number="5.5">
-<h2><span class="header-section-number">5.5</span> CATE
+<div id="cate-distribution" class="section level2" number="10.5">
+<h2><span class="header-section-number">10.5</span> CATE
 Distribution</h2>
 <pre class="r"><code># Predict individual-level CATEs
 cate_pred &lt;- predict(cf)$predictions
@@ -4726,8 +4744,8 @@ Women
 </tbody>
 </table>
 </div>
-<div id="best-linear-projection" class="section level2" number="5.6">
-<h2><span class="header-section-number">5.6</span> Best Linear
+<div id="best-linear-projection" class="section level2" number="10.6">
+<h2><span class="header-section-number">10.6</span> Best Linear
 Projection</h2>
 <p>The best linear projection (BLP) tests whether the CATEs vary
 systematically with observable characteristics, providing a formal test
@@ -4785,8 +4803,8 @@ there is <em>systematic heterogeneity</em> — i.e., whether individuals
 with higher predicted CATEs actually experience larger treatment
 effects.</p>
 </div>
-<div id="gender-based-heterogeneity" class="section level2" number="5.7">
-<h2><span class="header-section-number">5.7</span> Gender-Based
+<div id="gender-based-heterogeneity" class="section level2" number="10.7">
+<h2><span class="header-section-number">10.7</span> Gender-Based
 Heterogeneity</h2>
 <p>The paper’s primary heterogeneity analysis splits the sample by
 gender. We examine whether the causal forest recovers this pattern.</p>
@@ -4878,8 +4896,8 @@ Men
 </tbody>
 </table>
 </div>
-<div id="heterogeneity-by-baseline-reporting-willingness" class="section level2" number="5.8">
-<h2><span class="header-section-number">5.8</span> Heterogeneity by
+<div id="heterogeneity-by-baseline-reporting-willingness" class="section level2" number="10.8">
+<h2><span class="header-section-number">10.8</span> Heterogeneity by
 Baseline Reporting Willingness</h2>
 <p>We examine whether the campaign has different effects on those who
 were already willing to report at baseline versus those who were
@@ -4977,8 +4995,8 @@ High Baseline Reporting
 </tbody>
 </table>
 </div>
-<div id="heterogeneity-by-socioeconomic-status" class="section level2" number="5.9">
-<h2><span class="header-section-number">5.9</span> Heterogeneity by
+<div id="heterogeneity-by-socioeconomic-status" class="section level2" number="10.9">
+<h2><span class="header-section-number">10.9</span> Heterogeneity by
 Socioeconomic Status</h2>
 <p>The paper tests whether effects vary by SES (using a factor-analytic
 index). We replicate this using the causal forest.</p>
@@ -5073,8 +5091,8 @@ High SES
 </tbody>
 </table>
 </div>
-<div id="causal-forest-on-victimization-women-only" class="section level2" number="5.10">
-<h2><span class="header-section-number">5.10</span> Causal Forest on
+<div id="causal-forest-on-victimization-women-only" class="section level2" number="10.10">
+<h2><span class="header-section-number">10.10</span> Causal Forest on
 Victimization (Women Only)</h2>
 <p>We also estimate a causal forest for the victimization outcome (any
 violence), which is the policy-relevant outcome.</p>
@@ -5143,10 +5161,10 @@ cat(&quot;Women compliers with complete data:&quot;, sum(complete_vict), &quot;\
 <hr />
 </div>
 </div>
-<div id="conclusion" class="section level1" number="6">
-<h1><span class="header-section-number">6</span> Conclusion</h1>
-<div id="summary-of-replication" class="section level2" number="6.1">
-<h2><span class="header-section-number">6.1</span> Summary of
+<div id="conclusion" class="section level1" number="11">
+<h1><span class="header-section-number">11</span> Conclusion</h1>
+<div id="summary-of-replication" class="section level2" number="11.1">
+<h2><span class="header-section-number">11.1</span> Summary of
 Replication</h2>
 <p>We successfully replicate the key findings of Green, Wilke, and
 Cooper across all major tables and figures:</p>
@@ -5187,8 +5205,8 @@ equality. All 90% confidence intervals include zero, ruling out attitude
 change as the primary mechanism.</p></li>
 </ol>
 </div>
-<div id="extension-causal-forest-findings" class="section level2" number="6.2">
-<h2><span class="header-section-number">6.2</span> Extension: Causal
+<div id="extension-causal-forest-findings" class="section level2" number="11.2">
+<h2><span class="header-section-number">11.2</span> Extension: Causal
 Forest Findings</h2>
 <p>The causal forest analysis adds value in several ways:</p>
 <ol style="list-style-type: decimal">
@@ -5208,8 +5226,8 @@ important moderator, and compare the pattern to the paper’s
 finding.</p></li>
 </ol>
 </div>
-<div id="notes-on-methodology" class="section level2" number="6.3">
-<h2><span class="header-section-number">6.3</span> Notes on
+<div id="notes-on-methodology" class="section level2" number="11.3">
+<h2><span class="header-section-number">11.3</span> Notes on
 Methodology</h2>
 <ul>
 <li><strong>P-values</strong>: Our p-values use asymptotic
@@ -5229,8 +5247,8 @@ discrepancies.</li>
 results.</li>
 </ul>
 </div>
-<div id="limitations" class="section level2" number="6.4">
-<h2><span class="header-section-number">6.4</span> Limitations</h2>
+<div id="limitations" class="section level2" number="11.4">
+<h2><span class="header-section-number">11.4</span> Limitations</h2>
 <ul>
 <li><strong>Small sample sizes</strong>: With approximately 300-700
 compliers per gender, the power to detect heterogeneous effects is
@@ -5248,8 +5266,8 @@ estimates may be noisy, particularly for the victimization outcome.</li>
 <hr />
 </div>
 </div>
-<div id="session-info" class="section level1" number="7">
-<h1><span class="header-section-number">7</span> Session Info</h1>
+<div id="session-info" class="section level1" number="12">
+<h1><span class="header-section-number">12</span> Session Info</h1>
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>## R version 4.5.2 (2025-10-31)
 ## Platform: aarch64-apple-darwin20
