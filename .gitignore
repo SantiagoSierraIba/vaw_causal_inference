@@ -20,3 +20,4 @@ Thumbs.db
 # Knit output (can be regenerated)
 replication/replication_cache/
 replication/replication_files/
+.Rproj.user

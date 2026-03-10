@@ -2430,14 +2430,15 @@ women_results$Stars &lt;- ifelse(women_results$P_value &lt; 0.01, &quot;***&quot
 # Format for display
 women_display &lt;- women_results %&gt;%
   mutate(
-    Estimate = paste0(round(Coef, 3), Stars, &quot;\n(&quot;, round(SE, 3), &quot;)&quot;),
+    Estimate = paste0(round(Coef, 3), Stars, &quot;&lt;br&gt;(&quot;, round(SE, 3), &quot;)&quot;),
     `Control Mean` = round(Ctrl_Mean, 3)
   ) %&gt;%
   select(Outcome, Wave, Estimate, `Control Mean`, N)
 
 kable(women_display,
       caption = &quot;Effect of Anti-VAW Campaign on Women&#39;s Reporting Attitudes (Complier Panel)&quot;,
-      align = c(&quot;l&quot;, &quot;l&quot;, &quot;r&quot;, &quot;r&quot;, &quot;r&quot;)) %&gt;%
+      align = c(&quot;l&quot;, &quot;l&quot;, &quot;r&quot;, &quot;r&quot;, &quot;r&quot;),
+      escape = FALSE) %&gt;%
   kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;),
                 full_width = FALSE) %&gt;%
   footnote(general = &quot;OLS with block FE, cluster-robust SEs (village level). * p&lt;0.1, ** p&lt;0.05, *** p&lt;0.01.&quot;)</code></pre>
@@ -2474,46 +2475,168 @@ Involve Parents
 Midline
 </td>
 <td style="text-align:right;">
-0.094* (0.056
+0.094*&lt;br&gt;(0.056)
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.46</div>
-(0.053
+0.462
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.43</div>
-(0.056
+321
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Involve Parents
+</td>
+<td style="text-align:left;">
+Endline
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.57</div>
-(0.058
+0.144***&lt;br&gt;(0.053)
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.52</div>
-(0.049
+0.439
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.22</div>
-(0.055
+321
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Involve Nabakyala
+</td>
+<td style="text-align:left;">
+Midline
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.40</div>
-(0.039
+0.076&lt;br&gt;(0.056)
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.15</div>
-(0.048
+0.579
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.20</div>
-(0.03
+321
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Involve Nabakyala
+</td>
+<td style="text-align:left;">
+Endline
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.35</div>
-(0.035
+0.158***&lt;br&gt;(0.058)
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.39</div>
+0.520
+</td>
+<td style="text-align:right;">
+321
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Involve LC1
+</td>
+<td style="text-align:left;">
+Midline
+</td>
+<td style="text-align:right;">
+0.058&lt;br&gt;(0.049)
+</td>
+<td style="text-align:right;">
+0.222
+</td>
+<td style="text-align:right;">
+321
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Involve LC1
+</td>
+<td style="text-align:left;">
+Endline
+</td>
+<td style="text-align:right;">
+0.041&lt;br&gt;(0.055)
+</td>
+<td style="text-align:right;">
+0.409
+</td>
+<td style="text-align:right;">
+321
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Report Police
+</td>
+<td style="text-align:left;">
+Midline
+</td>
+<td style="text-align:right;">
+0.096**&lt;br&gt;(0.039)
+</td>
+<td style="text-align:right;">
+0.158
+</td>
+<td style="text-align:right;">
+321
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Report Police
+</td>
+<td style="text-align:left;">
+Endline
+</td>
+<td style="text-align:right;">
+0.13***&lt;br&gt;(0.048)
+</td>
+<td style="text-align:right;">
+0.205
+</td>
+<td style="text-align:right;">
+321
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Intervention Index
+</td>
+<td style="text-align:left;">
+Midline
+</td>
+<td style="text-align:right;">
+0.085***&lt;br&gt;(0.03)
+</td>
+<td style="text-align:right;">
+0.355
+</td>
+<td style="text-align:right;">
+321
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Intervention Index
+</td>
+<td style="text-align:left;">
+Endline
+</td>
+<td style="text-align:right;">
+0.126***&lt;br&gt;(0.035)
+</td>
+<td style="text-align:right;">
+0.393
+</td>
+<td style="text-align:right;">
+321
+</td>
+</tr>
 </tbody>
 <tfoot>
 <tr>
@@ -2541,18 +2664,6 @@ N~321)</strong>:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td>Intervention Index</td>
-<td>Midline</td>
-<td align="right">0.085*** (0.030)</td>
-<td align="center">0.39</td>
-</tr>
-<tr class="even">
-<td>Intervention Index</td>
-<td>Endline</td>
-<td align="right">0.126*** (0.035)</td>
-<td align="center">0.36</td>
-</tr>
 <tr class="odd">
 <td>Involve Parents</td>
 <td>Midline</td>
@@ -2601,15 +2712,27 @@ N~321)</strong>:</p>
 <td align="right">0.117** (0.048)</td>
 <td align="center">0.37</td>
 </tr>
+<tr class="odd">
+<td>Intervention Index</td>
+<td>Midline</td>
+<td align="right">0.085*** (0.030)</td>
+<td align="center">0.39</td>
+</tr>
+<tr class="even">
+<td>Intervention Index</td>
+<td>Endline</td>
+<td align="right">0.126*** (0.035)</td>
+<td align="center">0.36</td>
+</tr>
 </tbody>
 </table>
-<p>Our replicated estimates should closely match these values. Minor
+<p>Our replicated estimates closely match these values. Minor
 differences may arise from LASSO covariate selection or SE computation
 (we use <code>sandwich::vcovCL</code>
 vs. <code>multiwayvcov::cluster.vcov</code>). Our p-values are two-sided
 and parametric; the paper uses one-sided randomization inference
-p-values. The overall pattern — large, positive, statistically
-significant effects on women’s reporting willingness — is clearly
+p-values. The overall pattern: large, positive, statistically
+significant effects on women’s reporting willingness, is clearly
 reproduced.</p>
 </div>
 <div id="reporting-attitudes-men-cps-table-2" class="section level2" number="4.2">
@@ -2652,14 +2775,15 @@ men_results$Stars &lt;- ifelse(men_results$P_value &lt; 0.01, &quot;***&quot;,
 
 men_display &lt;- men_results %&gt;%
   mutate(
-    Estimate = paste0(round(Coef, 3), Stars, &quot;\n(&quot;, round(SE, 3), &quot;)&quot;),
+    Estimate = paste0(round(Coef, 3), Stars, &quot;&lt;br&gt;(&quot;, round(SE, 3), &quot;)&quot;),
     `Control Mean` = round(Ctrl_Mean, 3)
   ) %&gt;%
   select(Outcome, Wave, Estimate, `Control Mean`, N)
 
 kable(men_display,
       caption = &quot;Effect of Anti-VAW Campaign on Men&#39;s Reporting Attitudes (Complier Panel)&quot;,
-      align = c(&quot;l&quot;, &quot;l&quot;, &quot;r&quot;, &quot;r&quot;, &quot;r&quot;)) %&gt;%
+      align = c(&quot;l&quot;, &quot;l&quot;, &quot;r&quot;, &quot;r&quot;, &quot;r&quot;),
+      escape = FALSE) %&gt;%
   kable_styling(bootstrap_options = c(&quot;striped&quot;, &quot;hover&quot;, &quot;condensed&quot;),
                 full_width = FALSE) %&gt;%
   footnote(general = &quot;OLS with block FE, cluster-robust SEs (village level). * p&lt;0.1, ** p&lt;0.05, *** p&lt;0.01.&quot;)</code></pre>
@@ -2696,46 +2820,168 @@ Involve Parents
 Midline
 </td>
 <td style="text-align:right;">
-0.082** (0.035
+0.082**&lt;br&gt;(0.035)
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.49</div>
-(0.035
+0.493
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.50</div>
-(0.038
+720
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Involve Parents
+</td>
+<td style="text-align:left;">
+Endline
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.61</div>
-(0.034
+0.038&lt;br&gt;(0.035)
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.61</div>
-(0.033
+0.502
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.28</div>
-(0.034
+720
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Involve Nabakyala
+</td>
+<td style="text-align:left;">
+Midline
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.35</div>
-(0.025
+0.032&lt;br&gt;(0.038)
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.20</div>
-(0.032
+0.612
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.22</div>
-(0.019
+720
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Involve Nabakyala
+</td>
+<td style="text-align:left;">
+Endline
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.39</div>
-(0.025
+0.057*&lt;br&gt;(0.034)
 </td>
 <td style="text-align:right;">
-<div class="line-block">       0.42</div>
+0.610
+</td>
+<td style="text-align:right;">
+720
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Involve LC1
+</td>
+<td style="text-align:left;">
+Midline
+</td>
+<td style="text-align:right;">
+0.021&lt;br&gt;(0.033)
+</td>
+<td style="text-align:right;">
+0.285
+</td>
+<td style="text-align:right;">
+720
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Involve LC1
+</td>
+<td style="text-align:left;">
+Endline
+</td>
+<td style="text-align:right;">
+0.043&lt;br&gt;(0.034)
+</td>
+<td style="text-align:right;">
+0.356
+</td>
+<td style="text-align:right;">
+720
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Report Police
+</td>
+<td style="text-align:left;">
+Midline
+</td>
+<td style="text-align:right;">
+-0.041&lt;br&gt;(0.025)
+</td>
+<td style="text-align:right;">
+0.203
+</td>
+<td style="text-align:right;">
+720
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Report Police
+</td>
+<td style="text-align:left;">
+Endline
+</td>
+<td style="text-align:right;">
+0.034&lt;br&gt;(0.032)
+</td>
+<td style="text-align:right;">
+0.227
+</td>
+<td style="text-align:right;">
+720
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Intervention Index
+</td>
+<td style="text-align:left;">
+Midline
+</td>
+<td style="text-align:right;">
+0.02&lt;br&gt;(0.019)
+</td>
+<td style="text-align:right;">
+0.398
+</td>
+<td style="text-align:right;">
+720
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Intervention Index
+</td>
+<td style="text-align:left;">
+Endline
+</td>
+<td style="text-align:right;">
+0.043*&lt;br&gt;(0.025)
+</td>
+<td style="text-align:right;">
+0.424
+</td>
+<td style="text-align:right;">
+720
+</td>
+</tr>
 </tbody>
 <tfoot>
 <tr>
@@ -2763,18 +3009,6 @@ N~720)</strong>:</p>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td>Intervention Index</td>
-<td>Midline</td>
-<td align="right">0.020 (0.019)</td>
-<td align="center">0.42</td>
-</tr>
-<tr class="even">
-<td>Intervention Index</td>
-<td>Endline</td>
-<td align="right">0.043* (0.025)</td>
-<td align="center">0.40</td>
-</tr>
 <tr class="odd">
 <td>Involve Parents</td>
 <td>Midline</td>
@@ -2822,6 +3056,18 @@ N~720)</strong>:</p>
 <td>Endline</td>
 <td align="right">0.046 (0.033)</td>
 <td align="center">0.38</td>
+</tr>
+<tr class="odd">
+<td>Intervention Index</td>
+<td>Midline</td>
+<td align="right">0.020 (0.019)</td>
+<td align="center">0.42</td>
+</tr>
+<tr class="even">
+<td>Intervention Index</td>
+<td>Endline</td>
+<td align="right">0.043* (0.025)</td>
+<td align="center">0.40</td>
 </tr>
 </tbody>
 </table>
@@ -3116,11 +3362,11 @@ Individual-level: OLS/Ordered Probit with block FE, cluster-robust SEs.
 <p><strong>Comparison with CPS Table 4</strong>:</p>
 <table>
 <colgroup>
+<col width="19%" />
+<col width="19%" />
 <col width="20%" />
 <col width="20%" />
-<col width="20%" />
-<col width="20%" />
-<col width="20%" />
+<col width="19%" />
 </colgroup>
 <thead>
 <tr class="header">

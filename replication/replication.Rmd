@@ -364,14 +364,15 @@ women_results$Stars <- ifelse(women_results$P_value < 0.01, "***",
 # Format for display
 women_display <- women_results %>%
   mutate(
-    Estimate = paste0(round(Coef, 3), Stars, "\n(", round(SE, 3), ")"),
+    Estimate = paste0(round(Coef, 3), Stars, "<br>(", round(SE, 3), ")"),
     `Control Mean` = round(Ctrl_Mean, 3)
   ) %>%
   select(Outcome, Wave, Estimate, `Control Mean`, N)
 
 kable(women_display,
       caption = "Effect of Anti-VAW Campaign on Women's Reporting Attitudes (Complier Panel)",
-      align = c("l", "l", "r", "r", "r")) %>%
+      align = c("l", "l", "r", "r", "r"),
+      escape = FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
                 full_width = FALSE) %>%
   footnote(general = "OLS with block FE, cluster-robust SEs (village level). * p<0.1, ** p<0.05, *** p<0.01.")
@@ -381,8 +382,6 @@ kable(women_display,
 
 | Outcome            | Wave    |     Paper Coef (SE) | Paper Ctrl Mean |
 |--------------------|---------|--------------------:|:---------------:|
-| Intervention Index | Midline | 0.085\*\*\* (0.030) |      0.39       |
-| Intervention Index | Endline | 0.126\*\*\* (0.035) |      0.36       |
 | Involve Parents    | Midline |     0.070\* (0.040) |      0.41       |
 | Involve Parents    | Endline | 0.172\*\*\* (0.050) |      0.40       |
 | Involve Nabakyala  | Midline |   0.098\*\* (0.041) |      0.40       |
@@ -391,8 +390,10 @@ kable(women_display,
 | Involve LC1        | Endline |   0.097\*\* (0.049) |      0.31       |
 | Report Police      | Midline |       0.067 (0.042) |      0.38       |
 | Report Police      | Endline |   0.117\*\* (0.048) |      0.37       |
+| Intervention Index | Midline | 0.085\*\*\* (0.030) |      0.39       |
+| Intervention Index | Endline | 0.126\*\*\* (0.035) |      0.36       |
 
-Our replicated estimates should closely match these values. Minor differences may arise from LASSO covariate selection or SE computation (we use `sandwich::vcovCL` vs. `multiwayvcov::cluster.vcov`). Our p-values are two-sided and parametric; the paper uses one-sided randomization inference p-values. The overall pattern --- large, positive, statistically significant effects on women's reporting willingness --- is clearly reproduced.
+Our replicated estimates closely match these values. Minor differences may arise from LASSO covariate selection or SE computation (we use `sandwich::vcovCL` vs. `multiwayvcov::cluster.vcov`). Our p-values are two-sided and parametric; the paper uses one-sided randomization inference p-values. The overall pattern: large, positive, statistically significant effects on women's reporting willingness, is clearly reproduced.
 
 ## Reporting Attitudes --- Men (CPS Table 2)
 
@@ -435,14 +436,15 @@ men_results$Stars <- ifelse(men_results$P_value < 0.01, "***",
 
 men_display <- men_results %>%
   mutate(
-    Estimate = paste0(round(Coef, 3), Stars, "\n(", round(SE, 3), ")"),
+    Estimate = paste0(round(Coef, 3), Stars, "<br>(", round(SE, 3), ")"),
     `Control Mean` = round(Ctrl_Mean, 3)
   ) %>%
   select(Outcome, Wave, Estimate, `Control Mean`, N)
 
 kable(men_display,
       caption = "Effect of Anti-VAW Campaign on Men's Reporting Attitudes (Complier Panel)",
-      align = c("l", "l", "r", "r", "r")) %>%
+      align = c("l", "l", "r", "r", "r"),
+      escape = FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"),
                 full_width = FALSE) %>%
   footnote(general = "OLS with block FE, cluster-robust SEs (village level). * p<0.1, ** p<0.05, *** p<0.01.")
@@ -452,8 +454,6 @@ kable(men_display,
 
 | Outcome            | Wave    | Paper Coef (SE) | Paper Ctrl Mean |
 |--------------------|---------|----------------:|:---------------:|
-| Intervention Index | Midline |   0.020 (0.019) |      0.42       |
-| Intervention Index | Endline | 0.043\* (0.025) |      0.40       |
 | Involve Parents    | Midline |   0.004 (0.029) |      0.42       |
 | Involve Parents    | Endline |   0.043 (0.039) |      0.42       |
 | Involve Nabakyala  | Midline |   0.019 (0.030) |      0.42       |
@@ -462,6 +462,8 @@ kable(men_display,
 | Involve LC1        | Endline |   0.045 (0.030) |      0.40       |
 | Report Police      | Midline |   0.032 (0.024) |      0.41       |
 | Report Police      | Endline |   0.046 (0.033) |      0.38       |
+| Intervention Index | Midline |   0.020 (0.019) |      0.42       |
+| Intervention Index | Endline | 0.043\* (0.025) |      0.40       |
 
 Men show smaller and generally insignificant effects, consistent with the paper's finding of a strong gender asymmetry. The endline intervention index (0.043, p\<0.10 with RI) is marginally significant. All point estimates are positive, suggesting the campaign had a weaker but directionally consistent effect on men's reporting willingness.
 
@@ -569,7 +571,7 @@ kable(vict_display,
 **Comparison with CPS Table 4**:
 
 | Outcome | Sample | Paper Coef (SE) | Paper Ctrl Mean | Paper RI p |
-|----|----|---:|:--:|:--:|
+|--------------|--------------|--------------:|:-------------:|:------------:|
 | \# Incidents | Village (All W) | -0.185\* (0.113) | 0.40 | 0.100 |
 | \# Incidents | Indiv. (All W) | -0.052 (0.048) | 0.40 | 0.294 |
 | \# Incidents | Indiv. (W Compl.) | -0.081 (0.068) | --- | 0.236 |
