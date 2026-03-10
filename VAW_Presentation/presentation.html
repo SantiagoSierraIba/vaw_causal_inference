@@ -18,348 +18,127 @@
     :root {
       --bg: #f7f7f7;
       --text: #2b2b2b;
-      --text-light: #5c5c5c;
+      --text-light: #6a6a6a;
       --accent: #5a7d9a;
-      --accent-light: #7a9bb5;
       --border: #d4d4d4;
       --row-alt: #f0f0f0;
       --highlight-bg: #eef3f7;
     }
 
+    /* ── Base ── */
     .reveal {
       font-family: 'Inter', sans-serif;
-      font-size: 28px;
       color: var(--text);
     }
-
-    .reveal .slides {
-      text-align: left;
-    }
-
+    .reveal .slides { text-align: left; }
     .reveal .slides section {
       background: var(--bg);
-      padding: 40px 60px;
+      box-sizing: border-box;
+      height: 100%;
+      padding: 36px 54px;
+      display: flex !important;
+      flex-direction: column;
+      justify-content: center;
     }
 
-    /* Headings */
-    .reveal h1 {
-      font-size: 1.8em;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 0.3em;
-      line-height: 1.2;
-    }
-    .reveal h2 {
-      font-size: 1.3em;
-      font-weight: 600;
-      color: var(--accent);
-      margin-bottom: 0.4em;
-      line-height: 1.3;
-      border-bottom: 2px solid var(--border);
-      padding-bottom: 0.2em;
-    }
-    .reveal h3 {
-      font-size: 1.05em;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.3em;
-    }
+    /* ── Typography ── */
+    .reveal h1 { font-size: 42px; font-weight: 700; color: var(--text); margin: 0 0 8px 0; line-height: 1.15; }
+    .reveal h2 { font-size: 30px; font-weight: 600; color: var(--accent); margin: 0 0 14px 0; line-height: 1.2; border-bottom: 2px solid var(--border); padding-bottom: 6px; }
+    .reveal h3 { font-size: 22px; font-weight: 600; color: var(--text); margin: 0 0 6px 0; }
+    .reveal p  { font-size: 18px; line-height: 1.5; margin: 4px 0; }
+    .reveal li { font-size: 18px; line-height: 1.45; margin-bottom: 3px; }
+    .reveal ul, .reveal ol { margin: 4px 0 4px 18px; padding: 0; }
+    .reveal blockquote { background: var(--highlight-bg); border-left: 4px solid var(--accent); padding: 10px 16px; font-style: normal; font-size: 17px; width: auto; margin: 8px 0; box-shadow: none; }
 
-    .reveal p, .reveal li {
-      font-size: 0.78em;
-      line-height: 1.55;
-      color: var(--text);
-    }
+    /* ── Slide numbers ── */
+    .reveal .slide-number { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-light); background: transparent; }
 
-    .reveal ul {
-      margin-left: 0.5em;
-    }
-    .reveal li {
-      margin-bottom: 0.35em;
-    }
+    /* ── Tables ── */
+    .reveal table { width: 100%; border-collapse: collapse; font-size: 17px; margin: 8px 0; }
+    .reveal table th { background: var(--accent); color: #fff; font-weight: 600; padding: 6px 10px; text-align: center; border: none; }
+    .reveal table th:first-child { text-align: left; }
+    .reveal table td { padding: 5px 10px; border-bottom: 1px solid var(--border); text-align: center; }
+    .reveal table td:first-child { text-align: left; font-weight: 500; }
+    .reveal table tr:nth-child(even) { background: var(--row-alt); }
+    .reveal table tr.highlight-row { background: var(--highlight-bg); font-weight: 700; }
 
-    /* Subtle slide numbers */
-    .reveal .slide-number {
-      font-family: 'Inter', sans-serif;
-      font-size: 12px;
-      color: var(--text-light);
-      background: transparent;
-      right: 20px;
-      bottom: 12px;
-    }
+    /* ── Callout ── */
+    .stat-callout { background: var(--highlight-bg); border-left: 4px solid var(--accent); padding: 10px 14px; margin: 6px 0; font-size: 17px; }
+    .stat-callout .big-number { font-size: 28px; font-weight: 700; color: var(--accent); }
 
-    /* Tables */
-    .reveal table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.72em;
-      margin: 0.6em 0;
-    }
-    .reveal table th {
-      background: var(--accent);
-      color: #fff;
-      font-weight: 600;
-      padding: 8px 12px;
-      text-align: center;
-      border: none;
-    }
-    .reveal table th:first-child {
-      text-align: left;
-    }
-    .reveal table td {
-      padding: 7px 12px;
-      border-bottom: 1px solid var(--border);
-      text-align: center;
-    }
-    .reveal table td:first-child {
-      text-align: left;
-      font-weight: 500;
-    }
-    .reveal table tr:nth-child(even) {
-      background: var(--row-alt);
-    }
-    .reveal table tr:last-child {
-      font-weight: 600;
-    }
-    .reveal table tr.highlight-row {
-      background: var(--highlight-bg);
-      font-weight: 700;
-    }
+    /* ── Images ── */
+    .reveal img { max-width: 100%; max-height: 100%; border-radius: 3px; }
 
-    /* Key stat callout */
-    .stat-callout {
-      background: var(--highlight-bg);
-      border-left: 4px solid var(--accent);
-      padding: 14px 20px;
-      margin: 0.5em 0;
-      font-size: 0.8em;
-    }
-    .stat-callout .big-number {
-      font-size: 1.6em;
-      font-weight: 700;
-      color: var(--accent);
-    }
+    /* ── Caption / Footnote ── */
+    .caption { font-size: 13px; color: var(--text-light); text-align: center; margin-top: 4px; line-height: 1.35; }
+    .footnote { font-size: 13px; color: var(--text-light); margin-top: 8px; border-top: 1px solid var(--border); padding-top: 4px; }
 
-    /* Images */
-    .reveal img.slide-img {
-      display: block;
-      margin: 0.4em auto;
-      max-width: 78%;
-      border-radius: 4px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    }
-    .reveal img.slide-img-sm {
-      display: block;
-      margin: 0.3em auto;
-      max-width: 60%;
-      border-radius: 4px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-    }
-    .reveal img.slide-img-full {
-      display: block;
-      margin: 0.3em auto;
-      max-width: 90%;
-      border-radius: 4px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    }
+    /* ── Video ── */
+    .video-container { text-align: center; flex: 1; display: flex; align-items: center; justify-content: center; }
+    .video-container video { width: 90%; max-height: 420px; border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
 
-    /* Caption */
-    .caption {
-      font-size: 0.58em;
-      color: var(--text-light);
-      text-align: center;
-      margin-top: 0.3em;
-      line-height: 1.4;
-    }
+    /* ── Title slide ── */
+    .title-slide { text-align: center !important; justify-content: center !important; }
+    .title-slide h1 { font-size: 38px; margin-bottom: 6px; }
+    .title-slide .subtitle { font-size: 22px; color: var(--accent); font-weight: 500; margin: 4px 0 20px 0; }
+    .title-slide .authors { font-size: 19px; color: var(--text); margin-bottom: 4px; }
+    .title-slide .course-info { font-size: 15px; color: var(--text-light); margin-bottom: 0; }
+    .title-slide .paper-ref { font-size: 13px; color: var(--text-light); margin-top: 28px; font-style: italic; }
 
-    /* Footnote */
-    .footnote {
-      font-size: 0.52em;
-      color: var(--text-light);
-      margin-top: 0.8em;
-      border-top: 1px solid var(--border);
-      padding-top: 0.3em;
-    }
+    /* ── Hook slide ── */
+    .hook-slide { text-align: center !important; padding: 24px 40px !important; }
+    .hook-slide h2 { border-bottom: none; text-align: center; font-size: 26px; margin-bottom: 6px; }
+    .hook-slide img { max-height: 440px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin: 0 auto; display: block; }
+    .hook-slide .caption { font-size: 12px; }
 
-    /* Video styling */
-    .video-container {
-      text-align: center;
-      margin: 0.3em 0;
-    }
-    .video-container video {
-      max-width: 85%;
-      max-height: 55vh;
-      border-radius: 4px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-    }
+    /* ── Grid layouts ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    .two-col-60-40 { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; align-items: start; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; align-items: stretch; }
 
-    /* Title slide */
-    .title-slide {
-      text-align: center !important;
-    }
-    .title-slide h1 {
-      font-size: 1.55em;
-      margin-top: 0.8em;
-      margin-bottom: 0.15em;
-    }
-    .title-slide .subtitle {
-      font-size: 0.85em;
-      color: var(--accent);
-      font-weight: 500;
-      margin-bottom: 0.8em;
-    }
-    .title-slide .authors {
-      font-size: 0.72em;
-      color: var(--text);
-      margin-bottom: 0.15em;
-    }
-    .title-slide .course-info {
-      font-size: 0.6em;
-      color: var(--text-light);
-      margin-bottom: 0.3em;
-    }
-    .title-slide .paper-ref {
-      font-size: 0.5em;
-      color: var(--text-light);
-      margin-top: 1.5em;
-      font-style: italic;
-    }
+    /* ── Panel ── */
+    .panel { background: #fff; border: 1px solid var(--border); border-radius: 5px; padding: 10px 12px; }
+    .panel h3 { font-size: 16px; color: var(--accent); margin-bottom: 5px; border-bottom: 1px solid var(--border); padding-bottom: 3px; }
+    .panel p { font-size: 14px; }
+    .panel table { font-size: 14px; }
+    .panel table th { padding: 4px 6px; }
+    .panel table td { padding: 3px 6px; }
+    .panel img { max-height: 160px; width: auto; display: block; margin: 4px auto; }
+    .panel .stat-callout { font-size: 14px; padding: 8px 10px; }
+    .panel .stat-callout .big-number { font-size: 22px; }
 
-    /* Grid layouts */
-    .two-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 30px;
-      align-items: start;
-    }
-    .three-col {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 18px;
-      align-items: start;
-    }
-    .panel {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 14px 16px;
-    }
-    .panel h3 {
-      font-size: 0.78em;
-      color: var(--accent);
-      margin-bottom: 0.4em;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 0.2em;
-    }
-    .panel p, .panel li {
-      font-size: 0.68em;
-    }
-    .panel table {
-      font-size: 0.65em;
-    }
+    /* ── Takeaway label ── */
+    .takeaway { font-size: 16px; font-weight: 600; color: var(--accent); margin: 0 0 6px 0; }
 
-    /* Takeaway strip */
-    .takeaway {
-      font-size: 0.72em;
-      font-weight: 600;
-      color: var(--accent);
-      margin-top: 0;
-      margin-bottom: 0.3em;
-    }
+    /* ── Backup marker ── */
+    .backup-marker { font-size: 13px; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2px; }
 
-    /* Backup slide marker */
-    .backup-marker {
-      font-size: 0.55em;
-      color: var(--text-light);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 0.2em;
-    }
+    /* ── Checkmark ── */
+    .check { color: #4a8c5c; font-weight: 700; }
 
-    /* Checkmark */
-    .check {
-      color: #4a8c5c;
-      font-weight: 700;
-    }
+    /* ── Bottom strip ── */
+    .bottom-strip { font-size: 14px; color: var(--text-light); margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--border); line-height: 1.5; }
 
-    /* Override reveal defaults */
-    .reveal .slides section .fragment.visible {
-      opacity: 1;
-    }
-    .reveal blockquote {
-      background: var(--highlight-bg);
-      border-left: 4px solid var(--accent);
-      padding: 12px 20px;
-      font-style: normal;
-      font-size: 0.78em;
-      width: 90%;
-      margin: 0.5em auto;
-    }
+    /* ── Thanks ── */
+    .thanks { text-align: center; margin-top: 20px; font-size: 28px; font-weight: 600; color: var(--accent); }
 
-    /* Small inline table */
-    .small-table {
-      font-size: 0.65em;
-      margin: 0.3em 0;
-    }
-    .small-table th {
-      padding: 5px 10px;
-    }
-    .small-table td {
-      padding: 5px 10px;
-    }
+    /* ── Variable importance pills ── */
+    .vimp-strip { display: inline-flex; gap: 6px; flex-wrap: wrap; vertical-align: middle; }
+    .vimp-item { background: var(--highlight-bg); border: 1px solid var(--border); border-radius: 3px; padding: 2px 8px; font-size: 13px; font-weight: 500; }
+    .vimp-item .vimp-val { font-weight: 700; color: var(--accent); }
 
-    /* Design bullet strip at bottom */
-    .bottom-strip {
-      font-size: 0.58em;
-      color: var(--text-light);
-      margin-top: 0.5em;
-      padding-top: 0.3em;
-      border-top: 1px solid var(--border);
-    }
+    /* ── Small table ── */
+    .small-table { font-size: 15px; }
+    .small-table th { padding: 4px 8px; }
+    .small-table td { padding: 4px 8px; }
 
-    /* Thank you */
-    .thanks {
-      text-align: center;
-      margin-top: 1.2em;
-      font-size: 1.2em;
-      font-weight: 600;
-      color: var(--accent);
-    }
+    /* ── Design slide image column ── */
+    .design-images { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+    .design-images img { max-height: 180px; width: auto; box-shadow: 0 1px 8px rgba(0,0,0,0.08); }
 
-    /* Slide 1 image override */
-    .hook-slide {
-      text-align: center !important;
-      padding: 20px 40px !important;
-    }
-    .hook-slide h2 {
-      border-bottom: none;
-      text-align: center;
-    }
-
-    /* Reduce table font in panels further */
-    .panel table th, .panel table td {
-      padding: 4px 8px;
-    }
-
-    /* Variable importance inline list */
-    .vimp-strip {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin: 0.3em 0;
-    }
-    .vimp-item {
-      background: var(--highlight-bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 3px 10px;
-      font-size: 0.6em;
-      font-weight: 500;
-    }
-    .vimp-item .vimp-val {
-      font-weight: 700;
-      color: var(--accent);
-    }
+    /* ── CF slide ── */
+    .cf-hist { text-align: center; margin-top: 6px; }
+    .cf-hist img { max-height: 200px; box-shadow: 0 2px 10px rgba(0,0,0,0.07); display: block; margin: 0 auto; }
   </style>
 </head>
 <body>
@@ -389,11 +168,9 @@
     <!-- ============================================================= -->
     <section class="hook-slide">
       <h2>"When is it acceptable for a man to hit his wife?"</h2>
-      <img src="images/avg_pct_women_acceptance_to_hit.jpg" alt="Percentage of women who accept VAW by country" class="slide-img-full">
+      <img src="images/avg_pct_women_acceptance_to_hit.jpg" alt="Percentage of women who accept VAW by country">
       <div class="caption">
-        Average percentage of women who state it is acceptable for a man to hit his wife in at least one of five scenarios,
-        by country. Scenarios: argues with him, burns the food, goes out without telling him, neglects the children, or refuses sex.
-        (DHS, 2001&ndash;2015). Solid line = sample average. Dashed line = Uganda.
+        Average % of women who state it is acceptable for a man to hit his wife in at least one of five scenarios, by country (DHS, 2001&ndash;2015). Dashed line = Uganda (~70%).
       </div>
       <aside class="notes">
         Before we begin, let us take a look at this chart. It shows the percentage of women, not men, women, who say it is acceptable for a husband to hit his wife. Each dot is a country. The dashed line is Uganda: about 70 percent of women in Uganda accept violence as justified in at least one scenario. Ugandan women are among the most affected in the world. About half of women aged 15 and older have experienced intimate partner violence. This is the context in which the experiment we replicated takes place.
@@ -411,8 +188,7 @@
           Your browser does not support the video tag.
         </video>
       </div>
-      <div class="caption">Video vignette from the media campaign (first minute)</div>
-      <div class="caption">One of three VAW video vignettes screened at village film festivals in rural Uganda</div>
+      <div class="caption">Video vignette from the media campaign (first minute) &mdash; one of three VAW vignettes screened at village film festivals</div>
       <aside class="notes">
         The paper we replicated, by Green, Wilke, and Cooper, was published in Comparative Political Studies in 2020 and it tested whether a mass media campaign could reduce domestic violence in rural Uganda, not by changing people's attitudes, but by making them feel safer to report it. And what was their approach? They screened short films about domestic violence during community film festivals. One of them, or the first minute of one of them is this one.
       </aside>
@@ -424,15 +200,14 @@
     <section>
       <h2>Research Question &amp; Experimental Design</h2>
       <blockquote>
-        Can a mass media campaign of VAW video vignettes screened at community film festivals change attitudes toward VAW, encourage reporting of violent incidents, and ultimately reduce intimate partner violence in rural Uganda?
+        Can a mass media campaign of VAW video vignettes screened at community film festivals encourage reporting of violent incidents and ultimately reduce intimate partner violence in rural Uganda?
       </blockquote>
-      <div class="two-col" style="margin-top: 0.5em;">
+      <div class="two-col-60-40">
         <div>
           <h3>Design</h3>
           <ul>
             <li><strong>112 villages</strong> in 16 geographic blocks</li>
-            <li>7 experimental conditions &rarr; collapsed to <strong>binary treatment</strong></li>
-            <li>48 treatment villages vs. 64 control villages</li>
+            <li>7 conditions &rarr; <strong>binary treatment</strong> (48 treated, 64 control)</li>
             <li>670 film screenings, 10,000+ adult attendees</li>
             <li><strong>Complier</strong> = attended &ge;1 screening</li>
             <li>Midline (Oct 2016, N=5,344) &rarr; Endline (May 2017, N=1,041)</li>
@@ -440,9 +215,9 @@
           </ul>
           <div class="footnote">Our replication uses parametric p values; the paper uses randomization inference.</div>
         </div>
-        <div style="text-align:center;">
-          <img src="images/clusters_map.jpg" alt="Map of 112 village clusters" class="slide-img" style="max-width:100%; margin-bottom: 0.3em;">
-          <img src="images/timeline_of_media_campaign.jpg" alt="Timeline of the media campaign" class="slide-img" style="max-width:100%;">
+        <div class="design-images">
+          <img src="images/clusters_map.jpg" alt="Map of 112 village clusters">
+          <img src="images/timeline_of_media_campaign.jpg" alt="Timeline of the media campaign">
         </div>
       </div>
       <aside class="notes">
@@ -458,56 +233,38 @@
       <h2>The campaign made women more willing to speak up</h2>
       <p class="takeaway">Replication of CPS Table 1: Reporting Willingness</p>
 
-      <h3>Women Compliers (N = 321)</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Outcome (Endline)</th>
-            <th>Our Estimate</th>
-            <th>Paper Estimate</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Involve Parents</td>
-            <td>0.144***</td>
-            <td>0.172***</td>
-          </tr>
-          <tr>
-            <td>Involve Nabakyala</td>
-            <td>0.158***</td>
-            <td>0.119**</td>
-          </tr>
-          <tr>
-            <td>Report to Police</td>
-            <td>0.130***</td>
-            <td>0.117**</td>
-          </tr>
-          <tr class="highlight-row">
-            <td>Intervention Index</td>
-            <td>0.126***</td>
-            <td>0.126***</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Men Compliers (N = 720)</h3>
-      <table class="small-table" style="max-width:55%;">
-        <thead>
-          <tr>
-            <th>Outcome (Endline)</th>
-            <th>Our Estimate</th>
-            <th>Paper Estimate</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="highlight-row">
-            <td>Intervention Index</td>
-            <td>0.043*</td>
-            <td>0.043*</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="two-col" style="align-items: start;">
+        <div>
+          <h3>Women Compliers (N = 321)</h3>
+          <table>
+            <thead>
+              <tr><th>Outcome (Endline)</th><th>Our Estimate</th><th>Paper Estimate</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Involve Parents</td><td>0.144***</td><td>0.172***</td></tr>
+              <tr><td>Involve Nabakyala</td><td>0.158***</td><td>0.119**</td></tr>
+              <tr><td>Report to Police</td><td>0.130***</td><td>0.117**</td></tr>
+              <tr class="highlight-row"><td>Intervention Index</td><td>0.126***</td><td>0.126***</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h3>Men Compliers (N = 720)</h3>
+          <table>
+            <thead>
+              <tr><th>Outcome (Endline)</th><th>Our Estimate</th><th>Paper Estimate</th></tr>
+            </thead>
+            <tbody>
+              <tr class="highlight-row"><td>Intervention Index</td><td>0.043*</td><td>0.043*</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top: 12px; font-size: 16px;">
+            Women: <strong>+12.6 pp</strong> on the composite index (p&lt;0.01)<br>
+            Men: <strong>+4.3 pp</strong>, marginally significant<br><br>
+            Strong gender asymmetry &mdash; the campaign works much better for women.
+          </p>
+        </div>
+      </div>
 
       <div class="footnote">
         OLS with block FE, LASSO covariates, cluster robust SEs. * p&lt;0.1, ** p&lt;0.05, *** p&lt;0.01 (parametric).
@@ -530,46 +287,35 @@
         <!-- Panel 1: Attitudes (null) -->
         <div class="panel">
           <h3>Not about changing attitudes</h3>
-          <img src="images/attitudes_VAW_and_gender_equality_unaffected_by_treatment.jpg"
-               alt="Null effects on attitudes" style="width:100%; border-radius:3px;">
-          <p style="margin-top:0.3em;">All confidence intervals cross zero. No effect on attitudes toward VAW or gender equality.</p>
-          <p style="font-size:0.6em; color:var(--text-light);">(CPS Figure 5 &mdash; replicated)</p>
+          <img src="images/attitudes_VAW_and_gender_equality_unaffected_by_treatment.jpg" alt="Null effects on attitudes">
+          <p>All CIs cross zero. No effect on attitudes toward VAW or gender equality.</p>
+          <p style="font-size:12px; color:var(--text-light);">(CPS Figure 5 &mdash; replicated)</p>
         </div>
 
         <!-- Panel 2: Gossip mechanism -->
         <div class="panel">
           <h3>It reduces the fear of speaking up</h3>
           <div class="stat-callout">
-            Women who expected to be called a "gossip" for reporting:<br>
+            Women expecting to be called a "gossip" for reporting:<br>
             <span class="big-number">63% &rarr; 52%</span><br>
             <strong>&minus;11.4 pp</strong> (p&lt;0.05)
           </div>
-          <p style="margin-top:0.4em;">The campaign reduced the perceived social cost of reporting &mdash; the fear of being branded a gossip.</p>
-          <p style="font-size:0.6em; color:var(--text-light);">Social Repercussions, CPS Table 3. Control mean = 0.626, coef = &minus;0.114**</p>
+          <p>The campaign reduced the perceived social cost of reporting.</p>
+          <p style="font-size:12px; color:var(--text-light);">Social Repercussions, CPS Table 3. Ctrl mean = 0.626, coef = &minus;0.114**</p>
         </div>
 
         <!-- Panel 3: Victimization -->
         <div class="panel">
           <h3>And violence went down</h3>
           <table>
-            <thead>
-              <tr><th>Outcome (Women)</th><th>Ours</th><th>Paper</th></tr>
-            </thead>
+            <thead><tr><th>Outcome (Women)</th><th>Ours</th><th>Paper</th></tr></thead>
             <tbody>
-              <tr>
-                <td>Any Violence (Village level)</td>
-                <td>&minus;0.071***</td>
-                <td>&minus;0.094**</td>
-              </tr>
-              <tr>
-                <td>Any Violence (W. Compliers)</td>
-                <td>&minus;0.131**</td>
-                <td>&minus;0.131***</td>
-              </tr>
+              <tr><td>Any Violence (Village)</td><td>&minus;0.071***</td><td>&minus;0.094**</td></tr>
+              <tr><td>Any Violence (Compliers)</td><td>&minus;0.131**</td><td>&minus;0.131***</td></tr>
             </tbody>
           </table>
-          <p style="margin-top:0.3em;">13 percentage point reduction in violence among women compliers (control mean = 31%).</p>
-          <p style="font-size:0.6em; color:var(--text-light);">CPS Table 4</p>
+          <p style="margin-top:6px;"><strong>13 pp reduction</strong> in violence among women compliers (ctrl mean = 31%).</p>
+          <p style="font-size:12px; color:var(--text-light);">CPS Table 4</p>
         </div>
       </div>
 
@@ -586,44 +332,30 @@
       <h2>Causal Forest Extension: Method &amp; Validation</h2>
 
       <div class="two-col">
-        <!-- Left: Method -->
         <div>
           <h3>Method</h3>
           <ul>
             <li><strong>Causal Forest</strong> (Athey, Tibshirani &amp; Wager, 2019)</li>
-            <li>Estimates <em>individual level</em> treatment effects (CATEs)</li>
+            <li>Estimates individual level treatment effects (CATEs)</li>
             <li>Honest estimation: separate subsamples for splitting vs. estimation</li>
             <li>4,000 trees, trained on 1,041 compliers</li>
-            <li>17 baseline covariates (age, household size, education, religion, baseline attitudes, asset index, etc.)</li>
-            <li>Clustered at village level</li>
+            <li>17 baseline covariates, clustered at village level</li>
           </ul>
-        </div>
-
-        <!-- Right: Validation -->
-        <div>
-          <h3>Validation</h3>
-          <table>
-            <thead>
-              <tr><th>Method</th><th>ATE</th><th>SE</th></tr>
-            </thead>
+          <h3 style="margin-top:10px;">Validation</h3>
+          <table style="max-width:85%;">
+            <thead><tr><th>Method</th><th>ATE</th><th>SE</th></tr></thead>
             <tbody>
               <tr><td>OLS</td><td>0.064</td><td>0.020</td></tr>
               <tr><td>Causal Forest</td><td>0.050</td><td>0.020</td></tr>
             </tbody>
           </table>
-          <p style="font-size:0.72em; margin-top:0.3em;">Forest confirms the positive average effect.</p>
-          <div class="stat-callout" style="margin-top:0.4em;">
-            Calibration test:<br>
-            mean.forest.prediction significant<br>
-            <strong>p = 0.004</strong>
-          </div>
+          <p style="font-size:15px;">Calibration test: mean.forest.prediction <strong>p = 0.004</strong></p>
         </div>
-      </div>
-
-      <!-- CATE histogram -->
-      <div style="text-align:center; margin-top:0.3em;">
-        <img src="images/cf-cate-distribution-1.png" alt="Distribution of estimated CATEs" class="slide-img" style="max-width:72%;">
-        <div class="caption">CATEs range from near zero to +0.09 &mdash; not everyone benefits equally. Red dashed line = ATE.</div>
+        <div>
+          <h3>CATE Distribution</h3>
+          <img src="images/cf-cate-distribution-1.png" alt="Distribution of estimated CATEs" style="max-height:340px; box-shadow: 0 2px 10px rgba(0,0,0,0.07);">
+          <p style="font-size:14px; color:var(--text-light); text-align:center;">CATEs range from near zero to +0.09. Not everyone benefits equally.</p>
+        </div>
       </div>
 
       <aside class="notes">
@@ -639,7 +371,6 @@
       <h2>Who benefits most?</h2>
 
       <div class="three-col">
-        <!-- Panel 1: Gender -->
         <div class="panel">
           <h3>By Gender</h3>
           <table>
@@ -652,7 +383,6 @@
           <p>Women benefit more than twice as much as men.</p>
         </div>
 
-        <!-- Panel 2: Baseline -->
         <div class="panel">
           <h3>By Baseline Willingness</h3>
           <table>
@@ -665,7 +395,6 @@
           <p>Films reinforce existing inclinations rather than converting skeptics.</p>
         </div>
 
-        <!-- Panel 3: SES -->
         <div class="panel">
           <h3>By Socioeconomic Status</h3>
           <table>
@@ -681,14 +410,14 @@
 
       <div class="bottom-strip">
         <strong>Variable importance (top 4):</strong>
-        <span class="vimp-strip" style="display:inline-flex; vertical-align:middle;">
+        <span class="vimp-strip">
           <span class="vimp-item">Age <span class="vimp-val">0.19</span></span>
           <span class="vimp-item">Baseline reporting <span class="vimp-val">0.15</span></span>
           <span class="vimp-item">Married <span class="vimp-val">0.12</span></span>
           <span class="vimp-item">Household head <span class="vimp-val">0.11</span></span>
         </span>
-        &nbsp;&bull;&nbsp; BLP: Christian only households are a significant moderator (p=0.028)
-        &nbsp;&bull;&nbsp; Victimization CF: ATE = &minus;0.122 (SE: 0.050) &mdash; confirms violence reduction
+        &nbsp;&bull;&nbsp; BLP: Christian only households significant moderator (p=0.028)
+        &nbsp;&bull;&nbsp; Victimization CF: ATE = &minus;0.122 (SE: 0.050)
       </div>
 
       <aside class="notes">
@@ -703,7 +432,7 @@
     <section>
       <h2>Takeaways</h2>
 
-      <ol style="font-size:0.82em; line-height:1.7; margin-top:0.8em;">
+      <ol style="font-size: 20px; line-height: 1.8; margin-top: 16px;">
         <li><strong>Replication succeeds</strong>: point estimates match closely across all main results (Tables 1&ndash;4, AER P&amp;P Table 1)</li>
         <li><strong>The campaign works &mdash; but not by changing minds</strong>: it reduces the <em>fear of speaking up</em>, and violence drops</li>
         <li><strong>Not everyone benefits equally</strong>: women, those already inclined to report, and higher SES individuals gain the most</li>
@@ -729,35 +458,31 @@
         <div>
           <h3>Cell Means: % Who Would Report</h3>
           <table>
-            <thead>
-              <tr><th></th><th>Campaign = 0</th><th>Campaign = 1</th></tr>
-            </thead>
+            <thead><tr><th></th><th>Campaign = 0</th><th>Campaign = 1</th></tr></thead>
             <tbody>
-              <tr><td>Alone (Others Observe = 0)</td><td>82.7% (N=284)</td><td>89.1% (N=230)</td></tr>
-              <tr><td>Group (Others Observe = 1)</td><td>88.9% (N=305)</td><td>91.0% (N=222)</td></tr>
+              <tr><td>Alone</td><td>82.7% (N=284)</td><td>89.1% (N=230)</td></tr>
+              <tr><td>Group</td><td>88.9% (N=305)</td><td>91.0% (N=222)</td></tr>
             </tbody>
           </table>
         </div>
         <div>
           <h3>Regression (Our Replication)</h3>
           <table>
-            <thead>
-              <tr><th>Variable</th><th>Col 1</th><th>Col 2</th><th>Col 3</th></tr>
-            </thead>
+            <thead><tr><th>Variable</th><th>Col 1</th><th>Col 2</th><th>Col 3</th></tr></thead>
             <tbody>
               <tr><td>Others Observe</td><td>0.041*</td><td>0.043*</td><td>0.061*</td></tr>
               <tr><td>Campaign</td><td>&mdash;</td><td>0.040**</td><td>0.061*</td></tr>
               <tr><td>Interaction</td><td>&mdash;</td><td>&mdash;</td><td>&minus;0.042</td></tr>
             </tbody>
           </table>
-          <p style="font-size:0.62em; color:var(--text-light); margin-top:0.3em;">
+          <p style="font-size:13px; color:var(--text-light);">
             Paper Col 3: Others Observe 0.058, Campaign 0.064**, Interaction &minus;0.073*
           </p>
         </div>
       </div>
-      <p style="font-size:0.72em; margin-top:0.5em;">
+      <p style="font-size: 16px; margin-top: 8px;">
         The campaign increases solo reporting by ~6 pp. The "Others Observe" effect among non treated (+6 pp) shrinks among treated.
-        Interpretation: the campaign reduces the need for corroborating witnesses &mdash; you no longer need others to validate your report.
+        The campaign reduces the need for corroborating witnesses.
       </p>
 
       <aside class="notes">
@@ -782,22 +507,22 @@
               <tr><td>differential.forest.prediction</td><td>&minus;2.870</td><td>0.977</td><td>0.998</td></tr>
             </tbody>
           </table>
-          <p style="font-size:0.68em; margin-top:0.3em;">
+          <p style="font-size:15px; margin-top:6px;">
             The forest captures the ATE well. The formal heterogeneity test does not reject homogeneity &mdash;
             CATEs should be interpreted with caution.
           </p>
-        </div>
-        <div>
-          <h3>Victimization CF (Women Only)</h3>
-          <table class="small-table">
+          <h3 style="margin-top:10px;">Victimization CF (Women Only)</h3>
+          <table class="small-table" style="max-width:70%;">
             <thead><tr><th>Metric</th><th>Value</th></tr></thead>
             <tbody>
               <tr><td>ATE</td><td>&minus;0.122 (SE: 0.050)</td></tr>
               <tr><td>Calibration p</td><td><strong>0.007</strong></td></tr>
             </tbody>
           </table>
-          <h3 style="margin-top:0.5em;">Variable Importance</h3>
-          <img src="images/cf-varimp-1.png" alt="Variable importance" style="width:100%; border-radius:3px;">
+        </div>
+        <div>
+          <h3>Variable Importance</h3>
+          <img src="images/cf-varimp-1.png" alt="Variable importance" style="max-height:360px; box-shadow: 0 2px 10px rgba(0,0,0,0.07);">
         </div>
       </div>
 
@@ -813,13 +538,13 @@
       <div class="backup-marker">Backup C</div>
       <h2>Discrepancies &amp; Methodology</h2>
 
-      <ul style="font-size:0.72em; line-height:1.7;">
+      <ul style="font-size: 17px; line-height: 1.7;">
         <li><strong>Men's individual reporting channels</strong>: We find a significant midline "Involve Parents" effect (0.082**) that the paper does not. This may reflect differences in LASSO covariate selection or SE computation.</li>
         <li><strong>P values</strong>: We use two sided parametric; the paper uses one sided randomization inference (1,000+ permutations within blocks). This explains differences in significance stars.</li>
         <li><strong>LASSO</strong>: Covariates were pre selected from the original pipeline and loaded directly.</li>
-        <li><strong>Standard errors</strong>: We use <code>sandwich::vcovCL</code>, which is equivalent to <code>multiwayvcov::cluster.vcov</code> used in the original code.</li>
-        <li><strong>Ordered probit</strong>: The ordered probit for victimization frequency did not converge in our replication &mdash; we report OLS instead.</li>
-        <li><strong>Village level specification</strong>: Uses regular OLS SEs (one observation per village), no <code>resample</code> variable, matching original code.</li>
+        <li><strong>Standard errors</strong>: We use <code>sandwich::vcovCL</code>, equivalent to <code>multiwayvcov::cluster.vcov</code>.</li>
+        <li><strong>Ordered probit</strong>: Did not converge in our replication &mdash; we report OLS instead.</li>
+        <li><strong>Village level specification</strong>: Uses regular OLS SEs (one obs. per village), no <code>resample</code> variable, matching original code.</li>
       </ul>
 
       <aside class="notes">
@@ -854,11 +579,11 @@
         </div>
         <div>
           <h3>Balance Check</h3>
-          <p style="font-size:0.72em;">
+          <p>
             All covariates balanced across treatment and control except <code>married_ml</code> (p=0.006) &mdash;
             minor and consistent with randomization noise across many tests.
           </p>
-          <p style="font-size:0.72em; margin-top:0.5em;">
+          <p style="margin-top:10px;">
             110 villages in analysis (48 treatment, 64 control, 16 blocks).
             Treatment was assigned at the village level via blocked random assignment.
           </p>
@@ -887,7 +612,7 @@
     transitionSpeed: 'default',
     keyboard: true,
     overview: true,
-    center: false,
+    center: true,
     width: 1280,
     height: 720,
     margin: 0.04,
