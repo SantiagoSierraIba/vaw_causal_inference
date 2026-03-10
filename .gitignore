@@ -21,3 +21,6 @@ Thumbs.db
 replication/replication_cache/
 replication/replication_files/
 .Rproj.user
+
+# Video files (too large for GitHub)
+VAW_Presentation/vignettes/
