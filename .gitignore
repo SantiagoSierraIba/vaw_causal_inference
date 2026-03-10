@@ -22,5 +22,6 @@ replication/replication_cache/
 replication/replication_files/
 .Rproj.user
 
-# Video files (too large for GitHub)
-VAW_Presentation/vignettes/
+# Video files (too large for GitHub, except trimmed version)
+VAW_Presentation/vignettes/*
+!VAW_Presentation/vignettes/IPV STORY 3 ROUND 2 TRIMMED.mp4
