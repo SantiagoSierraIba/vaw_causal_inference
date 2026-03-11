@@ -20,7 +20,7 @@ editor_options:
 -   Title: "Countering Violence Against Women by Encouraging Disclosure:
     A Mass Media Experiment in Rural Uganda"
 -   Subtitle: "Replication & Causal Forest Extension"
--   Authors: Santiago Sierra, Yen Hsi Lo, Ishika Naranj
+-   Authors: Santiago Sierra, Yen Hsi Lo, Ishika Narang
 -   Course: Causal Inference in AI Models — ESMT Berlin
 -   Date: March 2026
 -   Small text at bottom: "Based on Green, Wilke & Cooper (2020,
