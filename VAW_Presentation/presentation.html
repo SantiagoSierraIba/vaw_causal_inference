@@ -340,7 +340,7 @@
           <thead><tr><th>Method</th><th>ATE</th><th>SE</th></tr></thead>
           <tbody>
             <tr><td>OLS</td><td>0.064</td><td>0.020</td></tr>
-            <tr><td>Causal Forest</td><td>0.050</td><td>0.020</td></tr>
+            <tr><td>Causal Forest</td><td>0.040</td><td>0.022</td></tr>
           </tbody>
         </table>
         <p class="small">Calibration: mean.forest.prediction <strong>p = 0.004</strong></p>
@@ -353,7 +353,7 @@
     </div>
 
     <aside class="notes">
-      We extended the analysis using causal forests, which estimate treatment effects at the individual level rather than just a single average. We trained 4,000 trees on the complier sample using 17 baseline covariates: demographics, education, religion, attitudes, and household characteristics. As a sanity check, the forest's average treatment effect of 0.050 is close to the OLS estimate of 0.064, and the calibration test confirms the model is well specified. But the histogram shows the real insight: treatment effects vary considerably across individuals, from near zero to almost 0.10. Not everyone benefits equally. So who benefits most?
+      We extended the analysis using causal forests, which estimate treatment effects at the individual level rather than just a single average. We trained 4,000 trees on the complier sample using 17 baseline covariates: demographics, education, religion, attitudes, and household characteristics. As a sanity check, the forest's average treatment effect of 0.040 is close to the OLS estimate of 0.064, and the calibration test confirms the model is well specified. But the histogram shows the real insight: treatment effects vary considerably across individuals, from near zero to almost 0.10. Not everyone benefits equally. So who benefits most?
       Let me show you the key heterogeneity patterns.
     </aside>
   </section>

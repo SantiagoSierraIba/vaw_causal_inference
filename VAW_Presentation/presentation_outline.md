@@ -177,15 +177,18 @@ willingness to report domestic violence. Among women, the campaign
 produced strong, persistent effects. The composite intervention index,
 which averages willingness to involve parents, the village counselor,
 the village leader, and the police, increased by 12.6 percentage points
-at endline. Our replication matches the paper exactly on this measure.
-Across individual reporting channels, effects range from 13 to 16
-percentage points, all highly significant. The one exception is
-involving the village leader, which shows no significant effect for
-either our replication or the paper. For men, the picture is very
-different. Most individual channels show no significant effects. Only
+at endline (8 months after the screenings). Our replication matches the
+paper exactly on this measure. Across individual reporting channels,
+effects range from 13 to 16 percentage points, all highly significant.
+The one exception is involving the village leader, which shows no
+significant effect for either our replication or the paper for Women.
+For men, the picture is slightly different in significance as for our
+replication, most individual channels show no significant effects. Only
 the counselor channel and the composite index reach marginal
-significance at 4.3 percentage points. This gender asymmetry is one of
-the paper's key findings: the campaign works much better for women."
+significance at 5.7 and 4.3 percentage points, respectively. This gender
+asymmetry is one of the paper's key findings: the campaign works much
+better for women. But it also works for men, which is very interesting
+as they are the perpetrators"
 
 **Transition:** "But what is really interesting is *why* this works, and
 whether it actually reduced violence."
@@ -213,7 +216,7 @@ whether it actually reduced violence."
     pp (p\<0.05 parametric; RI p=0.01)**
 -   Smaller text: "Social Repercussions, CPS Table 3"
 -   Interpretation: "The campaign reduced the perceived social cost of
-    reporting — the fear of being branded a gossip"
+    reporting: the fear of being branded a gossip"
 
 **Panel 3 (bottom) — "And violence went down":**
 
@@ -267,8 +270,8 @@ causal forest extension."
 **Right column — Validation:**
 
 -   ATE comparison:
-    -   **OLS:** 0.064 (SE: 0.020)
-    -   **Causal Forest:** 0.050 (SE: 0.020)
+    -   **OLS:** 0.0639 (SE: 0.020)
+    -   **Causal Forest:** 0.0404 (SE: 0.0219)
     -   "Forest confirms positive average effect"
 -   Calibration: mean.forest.prediction significant (p=0.004)
 
