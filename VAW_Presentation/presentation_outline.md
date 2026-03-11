@@ -305,21 +305,22 @@ simplified:**
 
 **Panel 1 — Gender:** (use cf-gender-het-1.png)
 
-Women show a larger point estimate (~0.06) than men (~0.03), but
+Women show a larger point estimate (\~0.06) than men (\~0.03), but
 neither is statistically significant once we control for village level
 exposure (n_end_mean). The gender gap found in the paper may partly
 reflect differences in exposure or village level characteristics.
 
-**Panel 2 — Baseline Reporting Willingness:** (use cf-baseline-het-1.png)
+**Panel 2 — Baseline Reporting Willingness:** (use
+cf-baseline-het-1.png)
 
-High baseline reporting shows a significant effect (~0.115), while
-low baseline is not significant (~0.02). Films reinforce existing
+High baseline reporting shows a significant effect (\~0.115), while low
+baseline is not significant (\~0.02). Films reinforce existing
 inclinations rather than converting skeptics.
 
 **Panel 3 — Socioeconomic Status:** (use cf-ses-het-1.png)
 
-High SES shows a larger, barely significant effect (~0.07), while
-low SES is not significant (~0.03).
+High SES shows a larger, barely significant effect (\~0.07), while low
+SES is not significant (\~0.03).
 
 **Speaker notes:** "Three key patterns from the causal forest. First,
 gender: women show a larger point estimate than men, but the confidence
@@ -330,11 +331,11 @@ partly reflect differences in exposure or village level characteristics
 rather than a pure gender effect. Second, baseline willingness: people
 who were *already* somewhat willing to report at baseline respond
 significantly more. This tells us the films *reinforce* existing
-inclinations rather than converting skeptics from scratch. Third,
-higher SES individuals show larger effects. The variable importance
-ranking shows that village level endline mean and age are the strongest
-drivers of heterogeneity. And one interesting finding from the best
-linear projection: being in a Christian only household is a significant
+inclinations rather than converting skeptics from scratch. Third, higher
+SES individuals show larger effects. The variable importance ranking
+shows that village level endline mean and age are the strongest drivers
+of heterogeneity. And one interesting finding from the best linear
+projection: being in a Christian only household is a significant
 moderator. Finally, we also ran a causal forest on the victimization
 outcome for women, and the estimated effect is a 12.2 percentage point
 reduction in violence, consistent with the OLS results."
@@ -472,7 +473,7 @@ The presentation follows a deliberate narrative arc:
     went down. This is the intellectual core of the paper.
 6.  **EXTEND** (Ishika): Causal forests add individual-level nuance. The
     average effect is real and validated.
-7.  **DISCOVER** (Ishika): Who responds most? Those already inclined
-    to report, higher SES. The intervention reinforces, not converts.
+7.  **DISCOVER** (Ishika): Who responds most? Those already inclined to
+    report, higher SES. The intervention reinforces, not converts.
 8.  **CLOSE** (Ishika): Four crisp takeaways. Policy-relevant, concise,
     and memorable.
