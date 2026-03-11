@@ -246,7 +246,7 @@ we see a 13 percentage point reduction in actual violence experienced,
 matching the paper's estimate exactly."
 
 **Transition:** "So the replication holds up well. But we wanted to go
-further — who benefits most from this intervention? Ishika will show our
+further — who responds most to this intervention? Ishika will show our
 causal forest extension."
 
 ------------------------------------------------------------------------
@@ -273,84 +273,71 @@ causal forest extension."
     -   **OLS:** 0.0639 (SE: 0.020)
     -   **Causal Forest:** 0.0404 (SE: 0.0219)
     -   "Forest confirms positive average effect"
--   Calibration: mean.forest.prediction significant (p=0.004)
+-   Calibration: mean.forest.prediction significant (p=0.02)
 
-**Bottom — CATE histogram:**
+**Right column — Variable Importance:**
 
--   Distribution of individual-level treatment effects from the Rmd
-    output
--   Red dashed line at ATE
--   Label: "CATEs range from −0.01 to +0.09 — not everyone benefits
-    equally"
+-   Use cf-varimp-1.png (variable importance bar chart)
 
 **Speaker notes:** "We extended the analysis using causal forests, which
 estimate treatment effects at the *individual* level rather than just a
 single average. We trained 4,000 trees on the complier sample using 17
-baseline covariates — demographics, education, religion, attitudes, and
+baseline covariates: demographics, education, religion, attitudes, and
 household characteristics. As a sanity check, the forest's average
-treatment effect of 0.050 is close to the OLS estimate of 0.064, and the
-calibration test confirms the model is well-specified. But the histogram
-shows the real insight: treatment effects vary considerably across
-individuals, from near-zero to almost 0.10. Not everyone benefits
-equally — so who benefits most?"
+treatment effect of 0.040 is close to the OLS estimate of 0.064, and the
+calibration test confirms the model is well specified. The variable
+importance plot shows which covariates drive the most heterogeneity in
+treatment effects: village level endline mean, age, household members,
+and baseline reporting willingness. Treatment effects range from near
+zero to almost 0.10. Not everyone is equally affected, so who responds
+most to the intervention?"
 
 **Transition:** "Let me show you the key heterogeneity patterns."
 
 ------------------------------------------------------------------------
 
-## Slide 7 — Who Benefits Most?
+## Slide 7 — Who Responds Most?
 
 **Speaker:** Ishika \| **Timing:** 8:20–9:30 (\~70 seconds)
 
 **On screen — three bar-chart panels side by side (from Rmd output), or
 simplified:**
 
-**Panel 1 — Gender:**
+**Panel 1 — Gender:** (use cf-gender-het-1.png)
 
-| Group | GATE  |     95% CI      | Significant? |
-|-------|:-----:|:---------------:|:------------:|
-| Women | 0.080 | [0.013, 0.146]  |    Yes\*     |
-| Men   | 0.037 | [−0.013, 0.086] |      No      |
+Women show a larger point estimate (~0.06) than men (~0.03), but
+neither is statistically significant once we control for village level
+exposure (n_end_mean). The gender gap found in the paper may partly
+reflect differences in exposure or village level characteristics.
 
-**Panel 2 — Baseline Reporting Willingness:**
+**Panel 2 — Baseline Reporting Willingness:** (use cf-baseline-het-1.png)
 
-| Group         | GATE  |     95% CI      | Significant? |
-|---------------|:-----:|:---------------:|:------------:|
-| Low baseline  | 0.037 | [−0.003, 0.077] |      No      |
-| High baseline | 0.100 | [0.024, 0.176]  |    Yes\*     |
+High baseline reporting shows a significant effect (~0.115), while
+low baseline is not significant (~0.02). Films reinforce existing
+inclinations rather than converting skeptics.
 
-**Panel 3 — Socioeconomic Status:**
+**Panel 3 — Socioeconomic Status:** (use cf-ses-het-1.png)
 
-| Group    | GATE  |     95% CI      | Significant? |
-|----------|:-----:|:---------------:|:------------:|
-| Low SES  | 0.042 | [−0.004, 0.088] |      No      |
-| High SES | 0.067 | [0.009, 0.125]  |    Yes\*     |
+High SES shows a larger, barely significant effect (~0.07), while
+low SES is not significant (~0.03).
 
-**Bottom strip:**
-
--   Variable importance (top 4): Age (0.19) \> Household size (0.15) \>
-    Baseline reporting (0.12) \> Education (0.11)
--   "BLP: Christian-only households are a significant moderator
-    (p=0.028)"
--   Victimization CF: ATE = −0.122 (SE: 0.050) — confirms violence
-    reduction
-
-**Speaker notes:** "Three key findings. First, gender: the campaign's
-effect on women is 0.080 — more than double the effect on men, and
-statistically significant. The causal forest confirms the paper's gender
-split using a completely data-driven approach. Second, baseline
-attitudes: people who were *already* somewhat willing to report at
-baseline benefit more — their effect is 0.100, nearly three times the
-effect for those with low baseline willingness. This tells us the films
-*reinforce* existing inclinations rather than converting skeptics from
-scratch. Third, higher-SES individuals show larger effects. The variable
-importance ranking confirms that age and household composition are the
-strongest drivers of who benefits. And one interesting finding from the
-best linear projection: being in a Christian-only household is a
-significant moderator. Finally, we also ran a causal forest on the
-victimization outcome for women, and the estimated effect is a 12.2
-percentage point reduction in violence — consistent with the OLS
-results."
+**Speaker notes:** "Three key patterns from the causal forest. First,
+gender: women show a larger point estimate than men, but the confidence
+intervals overlap and both include zero. Once we control for village
+level exposure, the gender difference is no longer statistically
+significant. This suggests that the gender gap the paper found may
+partly reflect differences in exposure or village level characteristics
+rather than a pure gender effect. Second, baseline willingness: people
+who were *already* somewhat willing to report at baseline respond
+significantly more. This tells us the films *reinforce* existing
+inclinations rather than converting skeptics from scratch. Third,
+higher SES individuals show larger effects. The variable importance
+ranking shows that village level endline mean and age are the strongest
+drivers of heterogeneity. And one interesting finding from the best
+linear projection: being in a Christian only household is a significant
+moderator. Finally, we also ran a causal forest on the victimization
+outcome for women, and the estimated effect is a 12.2 percentage point
+reduction in violence, consistent with the OLS results."
 
 **Transition:** "Let me close with the takeaways."
 
@@ -366,23 +353,23 @@ results."
     main results (Tables 1–4, AER P&P Table 1)
 2.  **The campaign works — but not by changing minds**: it reduces the
     *fear of speaking up*, and violence drops
-3.  **Not everyone benefits equally**: women, those already inclined to
-    report, and higher-SES individuals gain the most
-4.  **Policy implication**: target screenings toward women; build on
-    existing pro-reporting norms rather than trying to change deep
-    attitudes
+3.  **Not everyone is equally affected**: those already inclined to
+    report and higher SES individuals respond the most
+4.  **Policy implication**: programs like this should be kept and
+    enhanced; men also became more willing to report, which is a huge
+    gain in fighting VAW; screenings should reach both women and men
 
 -   Bottom: **"Thank you — Questions?"**
 
 **Speaker notes:** "To close: we replicated the original findings
 successfully. The campaign does not change attitudes about violence — it
 changes something more actionable: the willingness to *speak up*. Our
-causal forest extension reveals that this effect is not uniform — women,
-those with some existing openness to reporting, and higher-SES
-individuals benefit the most. For policymakers, this means: target the
-people most likely to respond, and focus on making reporting feel safe
-rather than lecturing about whether violence is wrong. Thank you — happy
-to take questions."
+causal forest extension reveals that this effect is not uniform. Those
+with existing openness to reporting and higher SES individuals respond
+the most. Importantly, men also became more willing to report, which is
+a meaningful gain in fighting violence against women. Programs like this
+should not only continue but be enhanced, and they should reach both
+women and men. Thank you — happy to take questions."
 
 ------------------------------------------------------------------------
 
@@ -441,7 +428,7 @@ to take questions."
 | Slide 4 — Reporting Results         | Steffi   | 1:30      | 5:00       |
 | Slide 5 — Mechanism & Victimization | Steffi   | 1:50      | 6:50       |
 | Slide 6 — CF Method & Validation    | Ishika   | 1:30      | 8:20       |
-| Slide 7 — Who Benefits Most         | Ishika   | 1:10      | 9:30       |
+| Slide 7 — Who Responds Most         | Ishika   | 1:10      | 9:30       |
 | Slide 8 — Takeaways                 | Ishika   | 0:30      | 10:00      |
 | **Total**                           |          | **10:00** |            |
 
@@ -485,7 +472,7 @@ The presentation follows a deliberate narrative arc:
     went down. This is the intellectual core of the paper.
 6.  **EXTEND** (Ishika): Causal forests add individual-level nuance. The
     average effect is real and validated.
-7.  **DISCOVER** (Ishika): Who benefits? Women, those already inclined
-    to report, higher-SES. The intervention reinforces, not converts.
+7.  **DISCOVER** (Ishika): Who responds most? Those already inclined
+    to report, higher SES. The intervention reinforces, not converts.
 8.  **CLOSE** (Ishika): Four crisp takeaways. Policy-relevant, concise,
     and memorable.
